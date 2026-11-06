@@ -15,20 +15,18 @@ def Y(y): return (22 + M + 1.2 - y) * S
 balls = list(json.load(open(os.path.join(DATA,'mcu_maps.json')))['ours'].values())[0]
 rows = 'ABCDEFGHJKLMNPRTU'
 BGA_CX, BGA_CY = 11.0, 11.9          # BGA centre (card frame)
+# Orientation: the standard top-view ball map (A1 top-left, A1..A17 along the top edge) rotated
+# 90 degrees clockwise, so A1 is at the top-right, column 17 faces the fingers and row A is on the right.
 def ball_xy(b):
     ri = rows.index(b[0]); c = int(b[1:])
-    return BGA_CX + (ri - 8) * 0.8, BGA_CY + (c - 9) * 0.8      # col 17 toward the fingers? (see below)
-# orientation: column 17 faces the fingers (lowest y), row A at the left
-def ball_xy(b):
-    ri = rows.index(b[0]); c = int(b[1:])
-    return BGA_CX + (ri - 8) * 0.8, BGA_CY - (c - 9) * 0.8
+    return BGA_CX - (ri - 8) * 0.8, BGA_CY - (c - 9) * 0.8
 
 GROUP = {  # colour by function
-    'USB': '#7b3fe4', 'SAI1': '#e4572e', 'SAI4': '#ff9f80', 'LPSPI1': '#2e86ab', 'USDHC1': '#17a398', 'LPUART': '#f2a541',
+    'USB': '#7b3fe4', 'SAI1': '#e4572e', 'SAI4': '#ff9f80', 'LPSPI': '#2e86ab', 'USDHC1': '#17a398', 'LPUART': '#f2a541',
     'LPI2C': '#c33c54', 'CAN': '#3f7d20', 'ADC': '#a1662f', 'PWM': '#d97ab6', 'GPIO': '#6c757d',
     'SWD/BOOT/RST': '#111111', 'FLASH': '#0b3d91', 'STRAP': '#9aa5b1', 'XTAL/SNVS': '#b08900'}
 def group_of(fn, pad):
-    for k, g in [('USB', 'USB'), ('SAI4', 'SAI4'), ('SAI', 'SAI1'), ('LPSPI1', 'LPSPI1'), ('USDHC1', 'USDHC1'), ('LPUART', 'LPUART'),
+    for k, g in [('USB', 'USB'), ('SAI4', 'SAI4'), ('SAI', 'SAI1'), ('LPSPI', 'LPSPI'), ('USDHC1', 'USDHC1'), ('LPUART', 'LPUART'),
                  ('LPI2C', 'LPI2C'), ('CAN', 'CAN'), ('ADC', 'ADC'), ('FLEXPWM', 'PWM'), ('SWD', 'SWD/BOOT/RST'),
                  ('BOOT', 'SWD/BOOT/RST'), ('reset', 'SWD/BOOT/RST')]:
         if k in fn: return g
@@ -74,38 +72,39 @@ for b, names in balls.items():
     elif not n.startswith('GPIO') and not n.startswith('MIPI'): col, r = '#f4c2c2', 0.2     # power / analog
     else: col, r = '#ffffff', 0.17
     o.append(f'<circle cx="{X(x):.1f}" cy="{Y(y):.1f}" r="{r*S:.1f}" fill="{col}" stroke="#888" stroke-width="0.5"/>')
-o.append(f'<text x="{X(4)+3}" y="{Y(18.9)-4}" font-size="10">U1 RT1176 (MIMXRT1176DVMAB) 14×14 BGA, A1 top-left, column 17 toward fingers</text>')
+o.append(f'<text x="{X(4)+3}" y="{Y(18.9)-4}" font-size="10">U1 RT1176 (MIMXRT1176DVMAB) 14×14 BGA, A1 top-right (90° CW), column 17 toward fingers</text>')
 # top-side parts (approximate)
 def part(x, y, w, h, label, col='#fff3bf', fs=9, rot=False):
     o.append(f'<rect x="{X(x):.1f}" y="{Y(y+h):.1f}" width="{w*S:.1f}" height="{h*S:.1f}" fill="{col}" stroke="#555"/>')
     tx, ty = X(x + w / 2), Y(y + h / 2) + 3
     tr = f' transform="rotate(-90 {tx:.1f} {ty-3:.1f})"' if rot else ''
     o.append(f'<text x="{tx:.1f}" y="{ty:.1f}" font-size="{fs}" text-anchor="middle"{tr}>{label}</text>')
-part(0.5, 5.0, 3.0, 2.2, 'Flash', '#cfe0ff')
-part(0.6, 7.8, 2.8, 5.2, 'BOOT_CFG pulls', '#eeeeee', rot=True)
-part(0.6, 13.5, 2.8, 5.0, '3.3V bulk / LPSR', '#ffe0e0', rot=True)
-part(1.5, 19.3, 9.5, 2.2, 'bulk 0805s (DCDC_IN, DCDC_ANA)', '#ffe0e0')
-part(18.4, 4.8, 3.0, 2.0, '24 MHz', '#fff0b3')
-part(18.5, 7.4, 3.0, 1.9, '32.768k', '#fff0b3')
-part(18.4, 9.9, 3.1, 3.0, 'Reset sup.', '#e6e6e6')
-part(18.4, 13.4, 3.1, 2.6, 'BAT54C', '#e6e6e6')
-part(18.2, 16.6, 3.4, 3.4, '4.7µH', '#ffd6a5')
-part(18.7, 20.3, 1.6, 0.9, 'LED', '#d0f0c0', fs=7)
+part(0.6, 4.7, 3.0, 2.0, '24 MHz', '#fff0b3')
+part(0.6, 7.2, 3.0, 1.9, '32.768k', '#fff0b3')
+part(0.6, 9.6, 3.0, 3.0, 'Reset sup.', '#e6e6e6')
+part(0.6, 13.0, 3.0, 2.6, 'BAT54C', '#e6e6e6')
+part(0.2, 16.4, 4.0, 4.0, '4.7µH 4×4', '#ffd6a5')
+part(4.7, 19.25, 7.6, 2.2, 'bulk 0805s (DCDC_IN, DCDC_ANA)', '#ffe0e0')
+part(18.5, 4.7, 3.0, 5.5, 'Flash (see notes)', '#cfe0ff', rot=True)
+part(18.5, 10.7, 3.0, 5.4, 'BOOT_CFG pulls', '#eeeeee', rot=True)
+part(18.5, 16.6, 3.0, 2.4, 'inverter', '#e6e6e6')
+part(18.7, 20.0, 1.6, 0.9, 'LED', '#d0f0c0', fs=7)
 # legend
 lx = 24.2
-o.append(f'<text x="{X(lx)}" y="{Y(21.7)}" font-size="13" font-weight="bold">RT1176 MicroMod card: floorplan v0 (top view)</text>')
+o.append(f'<text x="{X(lx)}" y="{Y(21.7)}" font-size="13" font-weight="bold">RT1176 MicroMod card: floorplan v1 (top view)</text>')
 yy = 20.6
 for g, c in GROUP.items():
     o.append(f'<circle cx="{X(lx)+6}" cy="{Y(yy)-4}" r="6" fill="{c}"/><text x="{X(lx)+18}" y="{Y(yy)}" font-size="12">{g}</text>')
     yy -= 0.78
 notes = ['22 × 22 mm MicroMod outline, 0.8 mm 6-layer, ENIG + bevelled fingers',
          'Bottom side: 0402 decoupling under the BGA, 3 × 22 µF 0805 on the core rail',
-         'Everything else 0603/0805; inductor is the tightest part',
+         'Everything else 0603/0805. Tight fits: 4×4 inductor (top-left)',
+         'and the 6×5 mm flash (right band is 3.7 mm wide)',
          'Grey balls = ground, pink = power/analog, white = unused',
          'Fingers drawn: odd pins (top side); even pins are on the bottom side',
-         'USB OTG1 pair runs on an inner layer from the left of the BGA to pins 3/5']
+         'USB OTG1 balls sit right above pins 3/5']
 for t in notes:
     yy -= 0.15; o.append(f'<text x="{X(lx)}" y="{Y(yy)}" font-size="11" fill="#333">{t}</text>'); yy -= 0.7
 o.append('</svg>')
-open(os.path.join(ROOT,'docs','floorplan_v0.svg'), 'w').write('\n'.join(o))
+open(os.path.join(ROOT,'docs','floorplan_v1.svg'), 'w').write('\n'.join(o))
 print('ok')

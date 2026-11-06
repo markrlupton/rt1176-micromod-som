@@ -1,0 +1,177 @@
+{
+ "cost": 182.42000000000002,
+ "groups": {
+  "SAI4": {
+   "13": [
+    "GPIO_LPSR_10",
+    "SAI4_TX_SYNC"
+   ],
+   "15": [
+    "GPIO_LPSR_09",
+    "SAI4_TX_DATA"
+   ],
+   "21": [
+    "GPIO_LPSR_06",
+    "SAI4_RX_DATA"
+   ],
+   "23": [
+    "GPIO_LPSR_04",
+    "SAI4_TX_BCLK"
+   ]
+  },
+  "SPI": {
+   "57": [
+    "GPIO_AD_24",
+    "LPSPI2_SCK"
+   ],
+   "55": [
+    "GPIO_AD_25",
+    "LPSPI2_PCS0"
+   ],
+   "59": [
+    "GPIO_AD_26",
+    "LPSPI2_SDO"
+   ],
+   "61": [
+    "GPIO_AD_27",
+    "LPSPI2_SDI"
+   ]
+  },
+  "UART1": {
+   "17": [
+    "GPIO_DISP_B1_02",
+    "LPUART1_TX"
+   ],
+   "19": [
+    "GPIO_DISP_B1_03",
+    "LPUART1_RX"
+   ]
+  },
+  "UART2": {
+   "22": [
+    "GPIO_DISP_B2_10",
+    "LPUART2_TX"
+   ],
+   "20": [
+    "GPIO_DISP_B2_11",
+    "LPUART2_RX"
+   ]
+  },
+  "I2C": {
+   "12": [
+    "GPIO_DISP_B2_13",
+    "LPI2C4_SDA"
+   ],
+   "14": [
+    "GPIO_DISP_B2_12",
+    "LPI2C4_SCL"
+   ]
+  },
+  "I2C1": {
+   "51": [
+    "GPIO_AD_09",
+    "LPI2C1_SDA"
+   ],
+   "53": [
+    "GPIO_AD_08",
+    "LPI2C1_SCL"
+   ]
+  },
+  "CAN": {
+   "43": [
+    "GPIO_AD_30",
+    "CAN2_TX"
+   ],
+   "41": [
+    "GPIO_AD_31",
+    "CAN2_RX"
+   ]
+  }
+ },
+ "singles": {
+  "32": [
+   "GPIO_AD_28",
+   "FLEXPWM2_PWM2_A"
+  ],
+  "47": [
+   "GPIO_AD_29",
+   "FLEXPWM2_PWM2_B"
+  ],
+  "10": [
+   "GPIO_EMC_B1_09",
+   "FLEXPWM2_PWM1_B"
+  ],
+  "18": [
+   "GPIO_EMC_B1_19",
+   "FLEXPWM2_PWM3_A"
+  ],
+  "34": [
+   "GPIO_AD_13",
+   "ADC1_CH3B"
+  ],
+  "38": [
+   "GPIO_AD_19",
+   "ADC2_CH0B"
+  ],
+  "49": [
+   "GPIO_AD_16",
+   "ADC1_CH5A"
+  ],
+  "67": [
+   "GPIO_AD_07",
+   "ADC1_CH0B"
+  ],
+  "8": [
+   "GPIO_AD_15",
+   "ADC1_CH4B"
+  ],
+  "40": [
+   "GPIO_AD_34",
+   "GPIO"
+  ],
+  "42": [
+   "GPIO_AD_32",
+   "GPIO"
+  ],
+  "44": [
+   "GPIO_AD_33",
+   "GPIO"
+  ],
+  "46": [
+   "GPIO_AD_18",
+   "GPIO"
+  ],
+  "48": [
+   "GPIO_AD_04",
+   "GPIO"
+  ],
+  "73": [
+   "GPIO_AD_10",
+   "GPIO"
+  ],
+  "71": [
+   "GPIO_AD_01",
+   "GPIO"
+  ],
+  "69": [
+   "GPIO_AD_12",
+   "GPIO"
+  ],
+  "65": [
+   "GPIO_AD_11",
+   "GPIO"
+  ],
+  "63": [
+   "GPIO_AD_03",
+   "GPIO"
+  ],
+  "16": [
+   "GPIO_DISP_B1_01",
+   "GPIO"
+  ],
+  "4": [
+   "GPIO_DISP_B1_05",
+   "GPIO"
+  ]
+ }
+}
