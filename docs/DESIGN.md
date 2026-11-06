@@ -111,8 +111,8 @@ The card takes **3.3 V only** from the carrier (pins 2 and 74), and the RT1176's
 KiCad 7's command line has no ERC, so these checks stand in for it. Run ERC in the KiCad 8+ GUI as a cross-check.
 
 **Still open:**
-- Verify two footprints against vendor drawings:
-  - U4: KiCad's generic 4 × 4 mm WSON-8 is used until it's checked against the GigaDevice USON-8 drawing.
-  - L1: Changjiang FNR4030S pads are used until they're checked against Sunlord SWPA4030S.
+- U4 footprint is done: `rt1176-som:USON-8-1EP_4x4mm_P0.8mm_EP2.3x3mm_GigaDevice`, built from GD25Q128E datasheet DS-00480 rev 1.4 §10.3. The exposed pad goes to GND, which GigaDevice allows.
+  - QE (quad enable) ships as 0. The WP#/HOLD# pull-ups keep the part safe in single/dual mode; the boot configuration or firmware must set QE=1 for quad reads.
+- L1 footprint: Changjiang FNR4030S pads are used until they're checked against the Sunlord SWPA4030S land pattern.
 - Choose the 24 MHz crystal (2016 size) and set the C51/C52 load caps from its CL.
 - Add LCSC numbers for the passives. Parts with numbers so far: U2 C189211, U3 C7827, L1 C57269, D1 C37704, Y2 C32346.

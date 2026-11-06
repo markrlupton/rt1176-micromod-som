@@ -144,9 +144,9 @@ cap('+3V3', '100nF', '0402', 'power', 'NVCC_EMC1'); cap('+3V3', '100nF', '0402',
 cap('+3V3', '1uF', '0402', 'power', 'VDD_USB_3P3, under G12')
 
 # memory / clocks sheet
-part('U4', 'Memory_Flash:W25Q32JVSS', 'GD25Q128EQIGR', 'Package_SON:WSON-8-1EP_4x4mm_P0.8mm_EP2.2x3mm', 'mem',
+part('U4', 'Memory_Flash:W25Q32JVSS', 'GD25Q128EQIGR', 'rt1176-som:USON-8-1EP_4x4mm_P0.8mm_EP2.3x3mm_GigaDevice', 'mem',
      {'1': 'FLASH_CS_N', '2': 'FLASH_IO1', '3': 'FLASH_IO2', '4': 'GND', '5': 'FLASH_IO0', '6': 'FLASH_CLK', '7': 'FLASH_IO3', '8': '+3V3'},
-     MPN='GD25Q128EQIGR', Note='16 MB QSPI NOR, USON-8 4x4. Not at LCSC: global sourcing. Footprint: verify against GigaDevice drawing')
+     MPN='GD25Q128EQIGR', Note='16 MB QSPI NOR, USON-8 4x4 (footprint from DS-00480 rev 1.4; EP to GND). QE defaults to 0: WP#/HOLD# pulled up; set QE for quad reads. Not at LCSC: global sourcing')
 cap('+3V3', '100nF', '0603', 'mem', 'U4 bypass')
 for n in ('FLASH_CS_N', 'FLASH_IO2', 'FLASH_IO3'): res('+3V3', n, '10k', 'mem')
 part('Y1', 'Device:Crystal_GND24', '24MHz', 'Crystal:Crystal_SMD_2016-4Pin_2.0x1.6mm', 'mem',

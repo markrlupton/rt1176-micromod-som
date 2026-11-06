@@ -119,6 +119,33 @@ def write_edge_fp():
     L.append(')')
     open(os.path.join(LIB, 'rt1176-som.pretty', 'MicroMod_Card_Edge.kicad_mod'), 'w').write('\n'.join(L) + '\n')
 
+def write_uson_fp():
+    """GigaDevice USON8 4x4 mm (GD25Q128EQIGR), from datasheet DS-00480 rev 1.4 section 10.3:
+    D = E = 4.00, e = 0.80, b = 0.30, L = 0.40, exposed pad D1 x E1 = 2.30 x 3.00 (not connected internally;
+    GND or floating allowed). Lands: 0.35 x 0.75 mm from 1.50 to 2.25 mm off centre (0.25 mm toe past the
+    body edge), EP land 2.2 x 2.9 mm (0.4 mm to the signal lands), numbered 4 so it joins GND.
+    Pin 1-4 on the left (x < 0) top to bottom, 5-8 on the right bottom to top (top view)."""
+    L = ['(footprint "USON-8-1EP_4x4mm_P0.8mm_EP2.3x3mm_GigaDevice" (version 20221018) (generator rt1176_som_libgen) (layer "F.Cu")',
+         '  (descr "GigaDevice USON8 4x4 mm 0.8 mm pitch, EP 2.3x3.0 (GD25Q128E datasheet DS-00480 rev 1.4, 10.3)")',
+         '  (attr smd)',
+         '  (fp_text reference "REF**" (at 0 -3) (layer "F.SilkS") (effects (font (size 0.8 0.8) (thickness 0.12))))',
+         '  (fp_text value "USON-8_4x4mm" (at 0 3) (layer "F.Fab") (effects (font (size 0.8 0.8) (thickness 0.12))))']
+    for i in range(4):
+        y = -1.2 + 0.8 * i
+        L.append(f'  (pad "{i+1}" smd roundrect (at -1.875 {y:.1f}) (size 0.75 0.35) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25))')
+        L.append(f'  (pad "{8-i}" smd roundrect (at 1.875 {y:.1f}) (size 0.75 0.35) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25))')
+    L.append('  (pad "4" smd rect (at 0 0) (size 2.2 2.9) (layers "F.Cu" "F.Mask") (zone_connect 2))')
+    for x in (-0.55, 0.55):
+        for y in (-0.72, 0.72):
+            L.append(f'  (pad "" smd roundrect (at {x} {y}) (size 0.9 1.2) (layers "F.Paste") (roundrect_rratio 0.25))')
+    L += ['  (fp_rect (start -2 -2) (end 2 2) (stroke (width 0.1) (type default)) (fill none) (layer "F.Fab"))',
+          '  (fp_line (start -2.1 -2.1) (end 1.2 -2.1) (stroke (width 0.12) (type default)) (layer "F.SilkS"))',
+          '  (fp_line (start -1.2 2.1) (end 2.1 2.1) (stroke (width 0.12) (type default)) (layer "F.SilkS"))',
+          '  (fp_circle (center -2.55 -1.2) (end -2.45 -1.2) (stroke (width 0.2) (type default)) (fill solid) (layer "F.SilkS"))',
+          '  (fp_rect (start -2.5 -2.25) (end 2.5 2.25) (stroke (width 0.05) (type default)) (fill none) (layer "F.CrtYd"))',
+          ')']
+    open(os.path.join(LIB, 'rt1176-som.pretty', 'USON-8-1EP_4x4mm_P0.8mm_EP2.3x3mm_GigaDevice.kicad_mod'), 'w').write('\n'.join(L) + '\n')
+
 if __name__ == '__main__':
-    write_symlib(); write_edge_fp()
+    write_symlib(); write_edge_fp(); write_uson_fp()
     print('wrote lib/rt1176-som.kicad_sym and lib/rt1176-som.pretty/MicroMod_Card_Edge.kicad_mod')
