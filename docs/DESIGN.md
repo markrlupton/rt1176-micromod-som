@@ -1,0 +1,89 @@
+# RT1176 MicroMod card: stage 1 (pin map + floorplan)
+
+A MicroMod processor card that carries an NXP i.MX RT1176 and uses the SparkFun MicroMod Teensy pinout, so it drops into the RaceLink intercom carrier's M.2 slot (rev A.2b and later) in place of the MicroMod Teensy.
+
+Status: **stage 1 for review.** Nothing here is drawn in KiCad yet. Stage 2 is the schematic.
+
+## Decisions locked in
+
+| Item | Decision |
+|---|---|
+| Scope | MCU core only: RT1176, QSPI flash, crystals, the processor's own power parts, reset supervisor, boot inverter, status LED. No Wi-Fi, IMU, motion controller or KL26 debugger (the carrier has Bluetooth, CAN, Ethernet and audio). |
+| Pinout | Every MicroMod pin the SparkFun Teensy card uses gets the equivalent RT1176 function (54 pins, see `pintable.md`). The carrier's pins got first pick of pads. The four pins the Teensy leaves unconnected (13, 15, 21, 23) carry a **second SAI (SAI4)**: frame sync, data out, data in and bit clock. SWD moves to test pads on the card. |
+| Size | Target the standard 22 × 22 mm MicroMod outline. If the card has to grow, it grows sideways only; the 22 mm length and the screw slot stay put. |
+| Part sizes | 0402 only for decoupling under the BGA, 0603/0805 everywhere else, no 0201 planned. |
+| Toolchain | KiCad 7 + Python generator + Freerouting, the same as the intercom carrier. |
+
+## Mechanical
+
+- **Outline:** taken from SparkFun's Teensy MicroMod board file. 22 × 22 mm, fingers at the bottom edge with the key notch at x = 13.6 mm, and a 3.5 mm half-hole for the M2.5 screw at x = 15 mm. The slot is 4 mm right of centre, not in the middle.
+- **Fingers:** odd pins on top, even pins on the bottom, 0.5 mm pitch per side.
+- **Board:** 6 layers, 0.8 mm thick (the M.2 standard), ENIG with bevelled gold fingers. All of these are standard JLC options, but gold fingers add cost.
+- **Stack-up (proposed):** L1 signal, L2 GND, L3 signal (USB pair, BGA escape), L4 power (3.3 V, core rail island), L5 GND, L6 signal plus the decoupling parts.
+- **BGA placement:** the RT1176 is centred at x = 11 mm, with ball column 17 facing the fingers and row A on the left. The RT1176's GPIO_AD bank, USB, SDIO and crystal balls all sit along column 17, so 44 of the edge signals come from pads within five balls of the connector edge.
+- **USB:** the one awkward route. The USB OTG1 balls (E16/E17) are at the left of the BGA, but MicroMod pins 3/5 are at the right end of the fingers. The pair runs about 13 mm on L3, between the L2 and L5 grounds. USB OTG1 has to be the device port, because it's the only port the ROM serial downloader uses.
+- **Fit on your carrier:** a 22 mm card fits rev A.2b unchanged. If the card ever needs to be wider:
+  - About 0.8 mm is free on the pin-75 side before it overhangs D23 (SMA diode).
+  - About 1 mm is free on the pin-1 side before it overhangs SW2 (PTS810).
+  - Anything wider needs a keep-out on the rev B carrier.
+
+## Power
+
+The card takes **3.3 V only** from the carrier (pins 2 and 74), and the RT1176's internal DCDC makes the core and 1.8 V analog rails. There is no regulator on the card, which also removes the TPS62825 part-number trap from the G2 Nano.
+
+| Rail | Source | Feeds | Notes |
+|---|---|---|---|
+| +3V3 | carrier | DCDC_IN, VDD_LPSR_IN, every NVCC_* bank, VDDA_ADC_3P3, VDD_USB_3P3 | Every I/O bank runs at 3.3 V, as MicroMod requires. Flash is the 3.3 V W25Q128JV. |
+| DCDC_DIG (1.0/1.1 V) | RT1176 DCDC + 4.7 µH | VDD_SOC_IN | **3 × 22 µF 0805 + 0402s ≈ 70 µF**, meeting NXP's ~66 µF (the G2 Nano had ~31 µF) |
+| DCDC_ANA (1.8 V) | RT1176 DCDC | VDDA_1P8_IN, VDD_USB_1P8, VDDA_ADC_1P8, ADC_VREFH (through an RC filter) | |
+| VDD_SNVS_IN | BAT54C: diode-OR of +3V3 and MicroMod RTC_3V (pin 72) | RTC/SNVS | NVCC_SNVS tied to VDD_SNVS_ANA, per NXP's design guide |
+| LPSR_ANA / LPSR_DIG / VDDA_1P0 | internal LDOs | — | caps under their balls this time (the G2 Nano's sat about 12 mm away) |
+| DCDC_PSWITCH | 10k / 1 µF RC from +3V3 | | 10 ms, inside NXP's 5–40 ms window |
+
+**Current draw (estimate):** roughly 130–200 mA from 3.3 V with the M7 at 1 GHz and the M4 doing light work. That's somewhat more than the Teensy 4's 100–150 mA. The carrier's +3V3D AP2114H LDO is budgeted at 300 mA, and its README already flags that LDO's temperature in a hot cabin. The card adds load to that same rail, so a buck on +3V3D is worth considering for rev B.
+
+## Reset, boot and debug
+
+- **RESET# (pin 6) → reset supervisor → POR_B.** A TPS3808 (SOT-23-6) watches 3.3 V and holds the chip in reset during power-up, which fixes the missing-POR_B-hold issue on the G2 Nano. The carrier's button drives the supervisor's manual-reset input. **Behaviour change:** on the Teensy, this pin is ON/OFF (hold 5 s to power off). On this card it's a real reset, so SW2's "ON/OFF" label on the carrier becomes "RESET".
+- **BOOT# (pin 11) → BOOT_MODE1, and through an SN74LVC1G04 inverter → BOOT_MODE0.**
+  - Released: boot mode 10, internal boot from the QSPI flash.
+  - Held while pressing reset: boot mode 01, the NXP ROM serial downloader on USB (pins 3/5) and LPUART1 (pins 17/19). That's the standard NXP tool flow (MCUXpresso Secure Provisioning, `blhost`).
+  - Using mode 01 explicitly means it still works after fuses are blown for secure boot.
+- **BOOT_CFG straps:** 12 × 10k pull-downs (DISP_B1_06–11, DISP_B2_00–05), which select FlexSPI NOR. None of these pads go to the edge connector, so nothing on a carrier can change the boot device.
+- **SWD on card test pads** (SWDIO, SWCLK, RESET#, 3.3 V, GND) on the bottom side, sized for a pogo-pin fixture so the same pads serve production programming. MicroMod pins 21/23 now carry SAI4, so SWD is no longer on the edge connector.
+- **Status LED** on GPIO_LPSR_08, inside the card. The Teensy's LED is on pin 13 (SCK), which your carrier uses for SPI.
+
+## Clocks and memory
+
+- 24 MHz crystal (2016 size) on XTALI/XTALO, and a 32.768 kHz crystal (3215 size) on RTC_XTALI/O.
+- 16 MB W25Q128JV QSPI on FlexSPI1 port A (the boot ROM's default pins). DQS (SD_B2_05) is left open for loopback sampling.
+
+## Second audio interface (SAI4)
+
+| MicroMod pin | Spec name | RT1176 pad | Ball | Function |
+|---|---|---|---|---|
+| 13 | RTS1 | GPIO_LPSR_10 | R5 | SAI4_TX_SYNC (AUD2 frame sync) |
+| 15 | CTS1 | GPIO_LPSR_09 | P5 | SAI4_TX_DATA (AUD2 out) |
+| 21 | SWDCK | GPIO_LPSR_06 | P8 | SAI4_RX_DATA (AUD2 in) |
+| 23 | SWDIO | GPIO_LPSR_04 | N7 | SAI4_TX_BCLK (AUD2 bit clock) |
+
+- **Why SAI4:** SAI2 and SAI3 only come out on far-corner EMC_B2 pads. SAI4's pads sit on the right side of the BGA, next to these four fingers. SAI4 supports TDM and runs RX in synchronous mode off its TX clocks, like SAI1 on the codec.
+- **No second MCLK on the edge:** there are no spare MicroMod pins left for one. A second codec can share AUD_MCLK (pin 58) if it runs in the same sample-rate family. Otherwise SAI4_MCLK (GPIO_LPSR_05) comes out to a card test pad. A codec whose PLL works from BCLK alone needs no MCLK.
+- **Non-standard use of spec pins:** pins 13/15/21/23 are UART flow control and SWD in the MicroMod spec. On a third-party carrier that wires 21/23 to a SWD header, those pins would now carry audio clocks (harmless, but not SWD). On your carrier they're free; label them AUD2_* on rev B.
+
+## Differences from the MicroMod Teensy that affect your carrier or firmware
+
+1. **ADC full scale is 1.8 V, not 3.3 V.** The RT1176's ADC reference tops out at 1.89 V.
+   - VIN_SENSE (100k/10k) is fine: about 1.09 V at 12 V, and it clips only above about 18 V.
+   - **IGN_SENSE and AUX_SENSE (100k/22k) read about 2.16 V at 12 V, so they clip.** They still work as on/off detection. For real voltage readings, change the divider to 100k/12k on rev B: 1.29 V at 12 V, 1.71 V at 16 V.
+2. **RESET is a real reset, not ON/OFF** (see above).
+3. **Peripheral instances change.** CAN is FlexCAN2 (the Teensy uses CAN3), UART2 is LPUART10, and SPI is LPSPI1. All RT1176 FlexCANs support CAN FD.
+4. **SDIO pins are USDHC1 only.** The Teensy's alternate SPI1 on those pins has no RT1176 equivalent on these pads.
+5. **No Teensyduino.** Firmware uses the MCUXpresso SDK or Zephyr. You flash it with the BOOT button over USB, or over SWD through the card's test pads.
+6. **The I²C pins (12/14) lose their analog function.** On the Teensy they double as A4/A5; the RT1176's LPI2C1 pads aren't ADC inputs. Every other Teensy analog pin is still on an ADC-capable pad: A0, A1, BATT_VIN/3, G8, G11, and the UART2, I2C1 and audio pins.
+
+## Open items before the schematic
+
+- Confirm the DCDC inductor. NXP asks for 4.7 µH, more than 1.5 A saturation and under 0.1 Ω. A 3 × 3 mm part with that DCR is hard to find, and a 4 × 4 mm part needs the right-hand band or the bottom side.
+- Pick LCSC part numbers for every line (stage 2).
+- Bottom-side height under the card: the carrier's TE 2199230-4 slot sets how tall bottom parts can be. The 0402s and 0805s are 0.5–1.25 mm, which should be fine; I'll confirm it against the TE drawing.
