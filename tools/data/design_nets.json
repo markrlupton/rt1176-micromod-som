@@ -1,0 +1,759 @@
+{
+"J1": {
+"value": "MicroMod_Card",
+"pins": {
+"1": "GND",
+"2": "+3V3",
+"3": "USB_DP",
+"4": "V3V3_EN",
+"5": "USB_DN",
+"6": "RESET_N",
+"7": "GND",
+"8": "G11",
+"9": "USB_VIN",
+"10": "D0",
+"11": "BOOT_N",
+"12": "I2C_SDA",
+"13": "AUD2_LRCLK",
+"14": "I2C_SCL",
+"15": "AUD2_OUT",
+"16": "I2C_INT_N",
+"17": "TX1",
+"18": "D1",
+"19": "RX1",
+"20": "RX2",
+"21": "AUD2_IN",
+"22": "TX2",
+"23": "AUD2_BCLK",
+"32": "PWM0",
+"33": "GND",
+"34": "A0",
+"35": "USBHOST_DP",
+"36": "GND",
+"37": "USBHOST_DN",
+"38": "A1",
+"39": "GND",
+"40": "G0",
+"41": "CAN_RX",
+"42": "G1",
+"43": "CAN_TX",
+"44": "G2",
+"45": "GND",
+"46": "G3",
+"47": "PWM1",
+"48": "G4",
+"49": "BATT_VIN3",
+"50": "AUD_BCLK",
+"51": "I2C_SDA1",
+"52": "AUD_LRCLK",
+"53": "I2C_SCL1",
+"54": "AUD_IN",
+"55": "SPI_CS_N",
+"56": "AUD_OUT",
+"57": "SPI_SCK",
+"58": "AUD_MCLK",
+"59": "SPI_SDO",
+"60": "SDIO_CLK",
+"61": "SPI_SDI",
+"62": "SDIO_CMD",
+"63": "G10",
+"64": "SDIO_DATA0",
+"65": "G9",
+"66": "SDIO_DATA1",
+"67": "G8",
+"68": "SDIO_DATA2",
+"69": "G7",
+"70": "SDIO_DATA3",
+"71": "G6",
+"72": "RTC_3V",
+"73": "G5",
+"74": "+3V3",
+"75": "GND"
+}
+},
+"C1": {
+"value": "22uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C2": {
+"value": "10uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C3": {
+"value": "100nF",
+"pins": {
+"1": "USB_VIN",
+"2": "GND"
+}
+},
+"U2": {
+"value": "TPS3808G30DBVR",
+"pins": {
+"1": "POR_B",
+"2": "GND",
+"3": "RESET_N",
+"4": null,
+"5": "+3V3",
+"6": "+3V3"
+}
+},
+"C4": {
+"value": "100nF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"U3": {
+"value": "SN74LVC1G04DBVR",
+"pins": {
+"2": "BOOT_N",
+"3": "GND",
+"4": "BOOT_MODE0",
+"5": "+3V3"
+}
+},
+"C5": {
+"value": "100nF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"R1": {
+"value": "10k",
+"pins": {
+"1": "+3V3",
+"2": "BOOT_N"
+}
+},
+"TP1": {
+"value": "SWDIO",
+"pins": {
+"1": "SWDIO"
+}
+},
+"TP2": {
+"value": "SWCLK",
+"pins": {
+"1": "SWCLK"
+}
+},
+"TP3": {
+"value": "RESET#",
+"pins": {
+"1": "RESET_N"
+}
+},
+"TP4": {
+"value": "BOOT#",
+"pins": {
+"1": "BOOT_N"
+}
+},
+"TP5": {
+"value": "3V3",
+"pins": {
+"1": "+3V3"
+}
+},
+"TP6": {
+"value": "GND",
+"pins": {
+"1": "GND"
+}
+},
+"TP7": {
+"value": "SAI4_MCLK",
+"pins": {
+"1": "SAI4_MCLK"
+}
+},
+"U1.2": {
+"value": "MIMXRT1176DVMAB",
+"pins": "U1"
+},
+"U1.3": {
+"value": "MIMXRT1176DVMAB",
+"pins": "U1"
+},
+"U1.4": {
+"value": "MIMXRT1176DVMAB",
+"pins": "U1"
+},
+"U1.5": {
+"value": "MIMXRT1176DVMAB",
+"pins": "U1"
+},
+"U1.6": {
+"value": "MIMXRT1176DVMAB",
+"pins": "U1"
+},
+"U1.1": {
+"value": "MIMXRT1176DVMAB",
+"pins": "U1"
+},
+"L1": {
+"value": "4.7uH",
+"pins": {
+"1": "DCDC_LN",
+"2": "DCDC_LP"
+}
+},
+"D1": {
+"value": "BAT54C",
+"pins": {
+"1": "+3V3",
+"2": "RTC_3V",
+"3": "VDD_SNVS_IN"
+}
+},
+"FB1": {
+"value": "120R@100MHz",
+"pins": {
+"1": "DCDC_ANA",
+"2": "ADC_VREFH"
+}
+},
+"FB2": {
+"value": "120R@100MHz",
+"pins": {
+"1": "+3V3",
+"2": "VDDA_ADC_3P3"
+}
+},
+"R2": {
+"value": "10k",
+"pins": {
+"1": "+3V3",
+"2": "DCDC_PSWITCH"
+}
+},
+"C6": {
+"value": "1uF",
+"pins": {
+"1": "DCDC_PSWITCH",
+"2": "GND"
+}
+},
+"R3": {
+"value": "10k",
+"pins": {
+"1": "DCDC_MODE",
+"2": "GND"
+}
+},
+"R4": {
+"value": "10k",
+"pins": {
+"1": "VDD_MIPI_1P0",
+"2": "GND"
+}
+},
+"R5": {
+"value": "10k",
+"pins": {
+"1": "VDD_MIPI_1P8",
+"2": "GND"
+}
+},
+"C7": {
+"value": "22uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C8": {
+"value": "4.7uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C9": {
+"value": "100nF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C10": {
+"value": "100nF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C11": {
+"value": "22uF",
+"pins": {
+"1": "DCDC_DIG",
+"2": "GND"
+}
+},
+"C12": {
+"value": "22uF",
+"pins": {
+"1": "DCDC_DIG",
+"2": "GND"
+}
+},
+"C13": {
+"value": "22uF",
+"pins": {
+"1": "DCDC_DIG",
+"2": "GND"
+}
+},
+"C14": {
+"value": "2.2uF",
+"pins": {
+"1": "DCDC_DIG",
+"2": "GND"
+}
+},
+"C15": {
+"value": "2.2uF",
+"pins": {
+"1": "DCDC_DIG",
+"2": "GND"
+}
+},
+"C16": {
+"value": "1uF",
+"pins": {
+"1": "DCDC_DIG",
+"2": "GND"
+}
+},
+"C17": {
+"value": "1uF",
+"pins": {
+"1": "DCDC_DIG",
+"2": "GND"
+}
+},
+"C18": {
+"value": "100nF",
+"pins": {
+"1": "DCDC_DIG",
+"2": "GND"
+}
+},
+"C19": {
+"value": "100nF",
+"pins": {
+"1": "DCDC_DIG",
+"2": "GND"
+}
+},
+"C20": {
+"value": "100nF",
+"pins": {
+"1": "DCDC_DIG",
+"2": "GND"
+}
+},
+"C21": {
+"value": "10uF",
+"pins": {
+"1": "DCDC_ANA",
+"2": "GND"
+}
+},
+"C22": {
+"value": "2.2uF",
+"pins": {
+"1": "DCDC_ANA",
+"2": "GND"
+}
+},
+"C23": {
+"value": "1uF",
+"pins": {
+"1": "DCDC_ANA",
+"2": "GND"
+}
+},
+"C24": {
+"value": "1uF",
+"pins": {
+"1": "DCDC_ANA",
+"2": "GND"
+}
+},
+"C25": {
+"value": "100nF",
+"pins": {
+"1": "DCDC_ANA",
+"2": "GND"
+}
+},
+"C26": {
+"value": "1uF",
+"pins": {
+"1": "ADC_VREFH",
+"2": "GND"
+}
+},
+"C27": {
+"value": "100nF",
+"pins": {
+"1": "ADC_VREFH",
+"2": "GND"
+}
+},
+"C28": {
+"value": "1uF",
+"pins": {
+"1": "VDDA_ADC_3P3",
+"2": "GND"
+}
+},
+"C29": {
+"value": "100nF",
+"pins": {
+"1": "VDDA_ADC_3P3",
+"2": "GND"
+}
+},
+"C30": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C31": {
+"value": "4.7uF",
+"pins": {
+"1": "VDD_LPSR_ANA",
+"2": "GND"
+}
+},
+"C32": {
+"value": "2.2uF",
+"pins": {
+"1": "VDD_LPSR_DIG",
+"2": "GND"
+}
+},
+"C33": {
+"value": "2.2uF",
+"pins": {
+"1": "VDDA_1P0",
+"2": "GND"
+}
+},
+"C34": {
+"value": "1uF",
+"pins": {
+"1": "VDD_SNVS_IN",
+"2": "GND"
+}
+},
+"C35": {
+"value": "2.2uF",
+"pins": {
+"1": "VDD_SNVS_ANA",
+"2": "GND"
+}
+},
+"C36": {
+"value": "100nF",
+"pins": {
+"1": "VDD_SNVS_ANA",
+"2": "GND"
+}
+},
+"C37": {
+"value": "220nF",
+"pins": {
+"1": "VDD_SNVS_DIG",
+"2": "GND"
+}
+},
+"C38": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C39": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C40": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C41": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C42": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C43": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C44": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C45": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C46": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C47": {
+"value": "100nF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C48": {
+"value": "100nF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C49": {
+"value": "1uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"U4": {
+"value": "GD25Q128EQIGR",
+"pins": {
+"1": "FLASH_CS_N",
+"2": "FLASH_IO1",
+"3": "FLASH_IO2",
+"4": "GND",
+"5": "FLASH_IO0",
+"6": "FLASH_CLK",
+"7": "FLASH_IO3",
+"8": "+3V3"
+}
+},
+"C50": {
+"value": "100nF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"R6": {
+"value": "10k",
+"pins": {
+"1": "+3V3",
+"2": "FLASH_CS_N"
+}
+},
+"R7": {
+"value": "10k",
+"pins": {
+"1": "+3V3",
+"2": "FLASH_IO2"
+}
+},
+"R8": {
+"value": "10k",
+"pins": {
+"1": "+3V3",
+"2": "FLASH_IO3"
+}
+},
+"Y1": {
+"value": "24MHz",
+"pins": {
+"1": "XTALI",
+"2": "GND",
+"3": "XTALO",
+"4": "GND"
+}
+},
+"C51": {
+"value": "12pF",
+"pins": {
+"1": "XTALI",
+"2": "GND"
+}
+},
+"C52": {
+"value": "12pF",
+"pins": {
+"1": "XTALO",
+"2": "GND"
+}
+},
+"Y2": {
+"value": "32.768kHz",
+"pins": {
+"1": "RTC_XTALI",
+"2": "RTC_XTALO"
+}
+},
+"C53": {
+"value": "18pF",
+"pins": {
+"1": "RTC_XTALI",
+"2": "GND"
+}
+},
+"C54": {
+"value": "18pF",
+"pins": {
+"1": "RTC_XTALO",
+"2": "GND"
+}
+},
+"RN1": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG0",
+"8": "GND",
+"2": "BOOT_CFG1",
+"7": "GND",
+"3": "BOOT_CFG2",
+"6": "GND",
+"4": "BOOT_CFG3",
+"5": "GND"
+}
+},
+"RN2": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG4",
+"8": "GND",
+"2": "BOOT_CFG5",
+"7": "GND",
+"3": "BOOT_CFG6",
+"6": "GND",
+"4": "BOOT_CFG7",
+"5": "GND"
+}
+},
+"RN3": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG8",
+"8": "GND",
+"2": "BOOT_CFG9",
+"7": "GND",
+"3": "BOOT_CFG10",
+"6": "GND",
+"4": "BOOT_CFG11",
+"5": "GND"
+}
+},
+"R9": {
+"value": "1k",
+"pins": {
+"1": "LED",
+"2": "LED_A"
+}
+},
+"D2": {
+"value": "Green",
+"pins": {
+"1": "GND",
+"2": "LED_A"
+}
+},
+"#FLG01": {
+"value": "PWR_FLAG",
+"pins": {
+"1": "GND"
+}
+},
+"#FLG02": {
+"value": "PWR_FLAG",
+"pins": {
+"1": "DCDC_DIG"
+}
+},
+"#FLG03": {
+"value": "PWR_FLAG",
+"pins": {
+"1": "DCDC_ANA"
+}
+},
+"#FLG04": {
+"value": "PWR_FLAG",
+"pins": {
+"1": "VDD_SNVS_ANA"
+}
+},
+"#FLG05": {
+"value": "PWR_FLAG",
+"pins": {
+"1": "VDD_SNVS_IN"
+}
+},
+"#FLG06": {
+"value": "PWR_FLAG",
+"pins": {
+"1": "ADC_VREFH"
+}
+},
+"#FLG07": {
+"value": "PWR_FLAG",
+"pins": {
+"1": "VDDA_ADC_3P3"
+}
+},
+"#FLG08": {
+"value": "PWR_FLAG",
+"pins": {
+"1": "VDD_MIPI_1P0"
+}
+},
+"#FLG09": {
+"value": "PWR_FLAG",
+"pins": {
+"1": "VDD_MIPI_1P8"
+}
+}
+}

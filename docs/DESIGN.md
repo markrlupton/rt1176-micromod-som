@@ -1,8 +1,8 @@
-# RT1176 MicroMod card: stage 1 (pin map + floorplan)
+# RT1176 MicroMod card: design notes
 
 A MicroMod processor card that carries an NXP i.MX RT1176 and uses the SparkFun MicroMod Teensy pinout, so it drops into the RaceLink intercom carrier's M.2 slot (rev A.2b and later) in place of the MicroMod Teensy.
 
-Status: **stage 1 for review.** Nothing here is drawn in KiCad yet. Stage 2 is the schematic.
+Status: **stage 2 (schematic) for review.** The schematic is `rt1176-micromod-som.kicad_sch` (4 sheets, KiCad 7), plotted in `docs/schematic.pdf`.
 
 ## Decisions locked in
 
@@ -91,3 +91,28 @@ The card takes **3.3 V only** from the carrier (pins 2 and 74), and the RT1176's
   - Sourcing: the GD25Q128EQIGR isn't stocked at LCSC (DigiKey has it), so it goes through JLC global sourcing or is consigned. Fallbacks: 8 MB W25Q64JVXGIQ (2 × 3 mm, C2940195) fits the same band; 16 MB W25Q128JVPIQ (6 × 5 mm, C190862) needs a rev B carrier with D22/F2 moved.
 - Pick LCSC part numbers for every line (stage 2).
 - Bottom-side height under the card: the carrier's TE 2199230-4 slot sets how tall bottom parts can be. The 0402s and 0805s are 0.5–1.25 mm, which should be fine; I'll confirm it against the TE drawing.
+
+## Schematic (stage 2)
+
+| Sheet | Contents |
+|---|---|
+| MicroMod edge, reset, boot, test pads | J1 card edge; U2 TPS3808G30 reset supervisor; U3 SN74LVC1G04 boot inverter; BOOT# pull-up; 3.3 V input bulk; SWD/production test pads TP1–TP7 |
+| RT1176 I/O | U1 units: GPIO_AD, LPSR/SNVS/system, SD/DISP, EMC, MIPI. Every pad is labelled with its net or marked no-connect |
+| RT1176 power | U1 power unit; L1 DCDC inductor; D1 RTC diode-OR; FB1 (ADC reference), FB2 (ADC 3.3 V); PSWITCH RC; DCDC_MODE and unused-MIPI resistors; all decoupling. Each 0402 cap's Note field names the ball it sits under |
+| Flash, clocks, boot straps, LED | U4 GD25Q128EQIGR + pull-ups; Y1 24 MHz; Y2 32.768 kHz; RN1–RN3 BOOT_CFG straps; status LED |
+
+**Checks** (`tools/schcheck.py`, PASS):
+- The KiCad netlist matches the design table exactly: 85 parts, 223 nets.
+- No single-pin nets, and every power input has a source.
+- All 289 RT1176 balls are present.
+- Every MicroMod pin matches `pinmap.py`.
+- NXP's rail rules hold: grounds, DCDC_IN, VDD_SOC_IN on DCDC_DIG, the 1.8 V analog inputs on DCDC_ANA, NVCC_SNVS tied to VDD_SNVS_ANA, and every NVCC bank at 3.3 V.
+
+KiCad 7's command line has no ERC, so these checks stand in for it. Run ERC in the KiCad 8+ GUI as a cross-check.
+
+**Still open:**
+- Verify two footprints against vendor drawings:
+  - U4: KiCad's generic 4 × 4 mm WSON-8 is used until it's checked against the GigaDevice USON-8 drawing.
+  - L1: Changjiang FNR4030S pads are used until they're checked against Sunlord SWPA4030S.
+- Choose the 24 MHz crystal (2016 size) and set the C51/C52 load caps from its CL.
+- Add LCSC numbers for the passives. Parts with numbers so far: U2 C189211, U3 C7827, L1 C57269, D1 C37704, Y2 C32346.

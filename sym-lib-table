@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "rt1176-som")(type "KiCad")(uri "${KIPRJMOD}/lib/rt1176-som.kicad_sym")(options "")(descr "project"))
+)
