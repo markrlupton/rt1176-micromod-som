@@ -10,7 +10,7 @@ Status: **stage 1 for review.** Nothing here is drawn in KiCad yet. Stage 2 is t
 |---|---|
 | Scope | MCU core only: RT1176, QSPI flash, crystals, the processor's own power parts, reset supervisor, boot inverter, status LED. No Wi-Fi, IMU, motion controller or KL26 debugger (the carrier has Bluetooth, CAN, Ethernet and audio). |
 | Pinout | Every MicroMod pin the SparkFun Teensy card uses gets the equivalent RT1176 function (54 pins, see `pintable.md`). The carrier's pins got first pick of pads. The four pins the Teensy leaves unconnected (13, 15, 21, 23) carry a **second SAI (SAI4)**: frame sync, data out, data in and bit clock. SWD moves to test pads on the card. |
-| Size | Target the standard 22 × 22 mm MicroMod outline. If the card has to grow, it grows sideways only; the 22 mm length and the screw slot stay put. |
+| Size | 22.8 × 22 mm: the MicroMod outline widened 0.8 mm on the pin-1 side for 16 MB flash. Length, fingers and screw slot are standard. |
 | Part sizes | 0402 only for decoupling under the BGA, 0603/0805 everywhere else, no 0201 planned. |
 | Toolchain | KiCad 7 + Python generator + Freerouting, the same as the intercom carrier. |
 
@@ -33,7 +33,7 @@ The card takes **3.3 V only** from the carrier (pins 2 and 74), and the RT1176's
 
 | Rail | Source | Feeds | Notes |
 |---|---|---|---|
-| +3V3 | carrier | DCDC_IN, VDD_LPSR_IN, every NVCC_* bank, VDDA_ADC_3P3, VDD_USB_3P3 | Every I/O bank runs at 3.3 V, as MicroMod requires. Flash is a 3.3 V W25Q-JV part. |
+| +3V3 | carrier | DCDC_IN, VDD_LPSR_IN, every NVCC_* bank, VDDA_ADC_3P3, VDD_USB_3P3 | Every I/O bank runs at 3.3 V, as MicroMod requires. Flash is a 3.3 V part. |
 | DCDC_DIG (1.0/1.1 V) | RT1176 DCDC + 4.7 µH | VDD_SOC_IN | **3 × 22 µF 0805 + 0402s ≈ 70 µF**, meeting NXP's ~66 µF (the G2 Nano had ~31 µF) |
 | DCDC_ANA (1.8 V) | RT1176 DCDC | VDDA_1P8_IN, VDD_USB_1P8, VDDA_ADC_1P8, ADC_VREFH (through an RC filter) | |
 | VDD_SNVS_IN | BAT54C: diode-OR of +3V3 and MicroMod RTC_3V (pin 72) | RTC/SNVS | NVCC_SNVS tied to VDD_SNVS_ANA, per NXP's design guide |
@@ -56,7 +56,7 @@ The card takes **3.3 V only** from the carrier (pins 2 and 74), and the RT1176's
 ## Clocks and memory
 
 - 24 MHz crystal (2016 size) on XTALI/XTALO, and a 32.768 kHz crystal (3215 size) on RTC_XTALI/O.
-- QSPI NOR (8 MB W25Q64JV planned, see open items) on FlexSPI1 port A (the boot ROM's default pins). DQS (SD_B2_05) is left open for loopback sampling.
+- 16 MB GD25Q128EQIGR QSPI NOR on FlexSPI1 port A (the boot ROM's default pins). DQS (SD_B2_05) is left open for loopback sampling.
 
 ## Second audio interface (SAI4)
 
@@ -85,6 +85,9 @@ The card takes **3.3 V only** from the carrier (pins 2 and 74), and the RT1176's
 ## Open items before the schematic
 
 - **DCDC inductor:** NXP asks for 4.7 µH, more than 1.5 A saturation and under 0.1 Ω. No 3 × 3 mm part that meets this is stocked at LCSC. The plan is Sunlord SWPA4030S4R7MT (C57269; 4 × 4 mm, 78 mΩ) in the top-left corner beside the DCDC balls, with the BGA nudged about 0.3 mm right to make room.
-- **Flash size vs card width:** the 16 MB W25Q128JV only comes in packages that won't fit the 3.7 mm right-hand band, and the carrier has parts right against both sides of the slot (D22 and F2 on one side, R137 and SW2 on the other). To stay at 22 mm, the plan is the **8 MB W25Q64JVXGIQ (2 × 3 mm, C2940195)**. 16 MB means growing the card about 1.5 mm and overhanging carrier parts.
+- **Flash and card width (decided):** 16 MB **GigaDevice GD25Q128EQIGR** (USON-8, 4 × 4 mm) in the right-hand band, with the card widened **0.8 mm on the pin-1 side, to 22.8 mm**. The 22 mm length, fingers and screw slot are unchanged.
+  - Clearance on the rev A.2b carrier: the card bottom sits 2.5 mm above the carrier (Würth 9774025151R standoff). The widened edge stays about 0.25 mm clear of SW2's body (PTS810, 2.5 mm tall). The only part underneath is R137 (0603, not fitted), about 2 mm below the card.
+  - The other side can't grow: D22 (SMAJ5.0A, up to 2.44 mm tall) would sit 0.06 mm under the card.
+  - Sourcing: the GD25Q128EQIGR isn't stocked at LCSC (DigiKey has it), so it goes through JLC global sourcing or is consigned. Fallbacks: 8 MB W25Q64JVXGIQ (2 × 3 mm, C2940195) fits the same band; 16 MB W25Q128JVPIQ (6 × 5 mm, C190862) needs a rev B carrier with D22/F2 moved.
 - Pick LCSC part numbers for every line (stage 2).
 - Bottom-side height under the card: the carrier's TE 2199230-4 slot sets how tall bottom parts can be. The 0402s and 0805s are 0.5–1.25 mm, which should be fine; I'll confirm it against the TE drawing.
