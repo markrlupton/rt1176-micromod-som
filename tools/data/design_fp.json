@@ -1,0 +1,625 @@
+{
+"J1": {
+"fp": "rt1176-som:MicroMod_Card_Edge",
+"value": "MicroMod_Card",
+"fields": {}
+},
+"C1": {
+"fp": "Capacitor_SMD:C_0805_2012Metric",
+"value": "22uF",
+"fields": {
+"Note": "3.3 V input bulk, at pins 2/74"
+}
+},
+"C2": {
+"fp": "Capacitor_SMD:C_0805_2012Metric",
+"value": "10uF",
+"fields": {
+"Note": "3.3 V input bulk"
+}
+},
+"C3": {
+"fp": "Capacitor_SMD:C_0603_1608Metric",
+"value": "100nF",
+"fields": {
+"Note": "USB1_VBUS sense"
+}
+},
+"U2": {
+"fp": "Package_TO_SOT_SMD:SOT-23-6",
+"value": "TPS3808G30DBVR",
+"fields": {
+"LCSC": "C189211",
+"MPN": "TPS3808G30DBVR"
+}
+},
+"C4": {
+"fp": "Capacitor_SMD:C_0603_1608Metric",
+"value": "100nF",
+"fields": {
+"Note": "U2 bypass"
+}
+},
+"U3": {
+"fp": "Package_TO_SOT_SMD:SOT-23-5",
+"value": "SN74LVC1G04DBVR",
+"fields": {
+"LCSC": "C7827",
+"MPN": "SN74LVC1G04DBVR"
+}
+},
+"C5": {
+"fp": "Capacitor_SMD:C_0603_1608Metric",
+"value": "100nF",
+"fields": {
+"Note": "U3 bypass"
+}
+},
+"R1": {
+"fp": "Resistor_SMD:R_0603_1608Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT# pull-up: released = internal boot (BOOT_MODE 10)"
+}
+},
+"TP1": {
+"fp": "TestPoint:TestPoint_Pad_D1.0mm",
+"value": "SWDIO",
+"fields": {}
+},
+"TP2": {
+"fp": "TestPoint:TestPoint_Pad_D1.0mm",
+"value": "SWCLK",
+"fields": {}
+},
+"TP3": {
+"fp": "TestPoint:TestPoint_Pad_D1.0mm",
+"value": "RESET#",
+"fields": {}
+},
+"TP4": {
+"fp": "TestPoint:TestPoint_Pad_D1.0mm",
+"value": "BOOT#",
+"fields": {}
+},
+"TP5": {
+"fp": "TestPoint:TestPoint_Pad_D1.0mm",
+"value": "SAI4_MCLK",
+"fields": {}
+},
+"U1": {
+"fp": "Package_BGA:MAPBGA_14x14mm_Layout17x17_P0.8mm",
+"value": "MIMXRT1176DVMAB",
+"fields": {
+"MPN": "MIMXRT1176DVMAB"
+}
+},
+"L1": {
+"fp": "Inductor_SMD:L_Changjiang_FNR4030S",
+"value": "4.7uH",
+"fields": {
+"LCSC": "C57269",
+"MPN": "SWPA4030S4R7MT",
+"Note": "NXP: 4.7 uH, Isat > 1.5 A, DCR < 0.1 ohm. Footprint: verify against Sunlord SWPA4030 land pattern"
+}
+},
+"D1": {
+"fp": "Package_TO_SOT_SMD:SOT-23",
+"value": "BAT54C",
+"fields": {
+"LCSC": "C37704",
+"MPN": "BAT54C,215",
+"Note": "diode-OR: 3.3 V and MicroMod RTC_3V (pin 72) -> VDD_SNVS_IN"
+}
+},
+"FB1": {
+"fp": "Inductor_SMD:L_0603_1608Metric",
+"value": "120R@100MHz",
+"fields": {
+"Note": "ADC reference from DCDC_ANA (1.8 V): ADC full scale is 1.8 V"
+}
+},
+"FB2": {
+"fp": "Inductor_SMD:L_0603_1608Metric",
+"value": "120R@100MHz",
+"fields": {}
+},
+"R2": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "PSWITCH RC: 10 ms, NXP window 5-40 ms"
+}
+},
+"C6": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "1uF",
+"fields": {
+"Note": "PSWITCH RC, under P3"
+}
+},
+"R3": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "under N4"
+}
+},
+"R4": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "MIPI unused: supply via 10k to GND (NXP HDG); under F10"
+}
+},
+"R5": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "MIPI unused: supply via 10k to GND (NXP HDG); under F9"
+}
+},
+"C7": {
+"fp": "Capacitor_SMD:C_0805_2012Metric",
+"value": "22uF",
+"fields": {
+"Note": "DCDC_IN"
+}
+},
+"C8": {
+"fp": "Capacitor_SMD:C_0603_1608Metric",
+"value": "4.7uF",
+"fields": {
+"Note": "DCDC_IN"
+}
+},
+"C9": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "100nF",
+"fields": {
+"Note": "DCDC_IN"
+}
+},
+"C10": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "100nF",
+"fields": {
+"Note": "DCDC_IN"
+}
+},
+"C11": {
+"fp": "Capacitor_SMD:C_0805_2012Metric",
+"value": "22uF",
+"fields": {
+"Note": "DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)"
+}
+},
+"C12": {
+"fp": "Capacitor_SMD:C_0805_2012Metric",
+"value": "22uF",
+"fields": {
+"Note": "DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)"
+}
+},
+"C13": {
+"fp": "Capacitor_SMD:C_0805_2012Metric",
+"value": "22uF",
+"fields": {
+"Note": "DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)"
+}
+},
+"C14": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)"
+}
+},
+"C15": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)"
+}
+},
+"C16": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "1uF",
+"fields": {
+"Note": "DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)"
+}
+},
+"C17": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "1uF",
+"fields": {
+"Note": "DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)"
+}
+},
+"C18": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "100nF",
+"fields": {
+"Note": "DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)"
+}
+},
+"C19": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "100nF",
+"fields": {
+"Note": "DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)"
+}
+},
+"C20": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "100nF",
+"fields": {
+"Note": "DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)"
+}
+},
+"C21": {
+"fp": "Capacitor_SMD:C_0603_1608Metric",
+"value": "10uF",
+"fields": {
+"Note": "DCDC_ANA"
+}
+},
+"C22": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "DCDC_ANA"
+}
+},
+"C23": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "1uF",
+"fields": {
+"Note": "VDDA_1P8_IN, under M11"
+}
+},
+"C24": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "1uF",
+"fields": {
+"Note": "VDDA_ADC_1P8, under K15"
+}
+},
+"C25": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "100nF",
+"fields": {
+"Note": "VDD_USB_1P8, under H12"
+}
+},
+"C26": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "1uF",
+"fields": {
+"Note": "under G16"
+}
+},
+"C27": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "1uF",
+"fields": {
+"Note": "under J13"
+}
+},
+"C28": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "VDD_LPSR_IN, under R12"
+}
+},
+"C29": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "4.7uF",
+"fields": {
+"Note": "under P12"
+}
+},
+"C30": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "under P11"
+}
+},
+"C31": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "under N11"
+}
+},
+"C32": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "1uF",
+"fields": {
+"Note": "under U12"
+}
+},
+"C33": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "under U14"
+}
+},
+"C34": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "100nF",
+"fields": {
+"Note": "NVCC_SNVS, under U11"
+}
+},
+"C35": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "220nF",
+"fields": {
+"Note": "under T14"
+}
+},
+"C36": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "NVCC_EMC1"
+}
+},
+"C37": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "NVCC_EMC1"
+}
+},
+"C38": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "NVCC_EMC2"
+}
+},
+"C39": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "NVCC_GPIO"
+}
+},
+"C40": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "NVCC_SD1"
+}
+},
+"C41": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "NVCC_SD2"
+}
+},
+"C42": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "NVCC_DISP1"
+}
+},
+"C43": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "NVCC_DISP2"
+}
+},
+"C44": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "2.2uF",
+"fields": {
+"Note": "NVCC_LPSR"
+}
+},
+"C45": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "100nF",
+"fields": {
+"Note": "NVCC_EMC1"
+}
+},
+"C46": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "100nF",
+"fields": {
+"Note": "NVCC_EMC2"
+}
+},
+"C47": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "1uF",
+"fields": {
+"Note": "VDD_USB_3P3, under G12"
+}
+},
+"U4": {
+"fp": "rt1176-som:USON-8-1EP_4x4mm_P0.8mm_EP2.3x3mm_GigaDevice",
+"value": "GD25Q128EQIGR",
+"fields": {
+"MPN": "GD25Q128EQIGR",
+"Note": "16 MB QSPI NOR, USON-8 4x4 (footprint from DS-00480 rev 1.4; EP to GND). QE defaults to 0: WP#/HOLD# pulled up; set QE for quad reads. Not at LCSC: global sourcing"
+}
+},
+"C50": {
+"fp": "Capacitor_SMD:C_0603_1608Metric",
+"value": "100nF",
+"fields": {
+"Note": "U4 bypass"
+}
+},
+"R6": {
+"fp": "Resistor_SMD:R_0603_1608Metric",
+"value": "10k",
+"fields": {
+"Note": ""
+}
+},
+"R7": {
+"fp": "Resistor_SMD:R_0603_1608Metric",
+"value": "10k",
+"fields": {
+"Note": ""
+}
+},
+"R8": {
+"fp": "Resistor_SMD:R_0603_1608Metric",
+"value": "10k",
+"fields": {
+"Note": ""
+}
+},
+"Y1": {
+"fp": "Crystal:Crystal_SMD_2016-4Pin_2.0x1.6mm",
+"value": "24MHz",
+"fields": {
+"Note": "24 MHz, CL to match C load caps"
+}
+},
+"C48": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "12pF",
+"fields": {
+"Note": "24 MHz load (set from crystal CL), under U16"
+}
+},
+"C49": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "12pF",
+"fields": {
+"Note": "24 MHz load, under T16"
+}
+},
+"Y2": {
+"fp": "Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm",
+"value": "32.768kHz",
+"fields": {
+"LCSC": "C32346",
+"MPN": "Q13FC1350000400",
+"Note": "FC-135, CL 12.5 pF"
+}
+},
+"C51": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "18pF",
+"fields": {
+"Note": "32k load, under T13"
+}
+},
+"C52": {
+"fp": "Capacitor_SMD:C_0402_1005Metric",
+"value": "18pF",
+"fields": {
+"Note": "32k load, under U13"
+}
+},
+"R9": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R10": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R11": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R12": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R13": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R14": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R15": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R16": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R17": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R18": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R19": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R20": {
+"fp": "Resistor_SMD:R_0402_1005Metric",
+"value": "10k",
+"fields": {
+"Note": "BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA"
+}
+},
+"R21": {
+"fp": "Resistor_SMD:R_0603_1608Metric",
+"value": "1k",
+"fields": {
+"Note": ""
+}
+},
+"D2": {
+"fp": "LED_SMD:LED_0603_1608Metric",
+"value": "Green",
+"fields": {}
+}
+}

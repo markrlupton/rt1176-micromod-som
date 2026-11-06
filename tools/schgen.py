@@ -71,13 +71,17 @@ parts = []    # dict(ref, lib, value, fp, sheet, unit, pins{num:net}, fields{}, 
 def part(ref, lib, value, fp, sheet, pins, unit=1, **fields):
     parts.append(dict(ref=ref, lib=lib, value=value, fp=fp, sheet=sheet, unit=unit, pins=pins, fields=fields))
 
+# Parts the board placement table refers to keep fixed references; everything else is numbered after them.
+RESERVED = {'C': {1, 2, 3, 4, 5, 7, 8, 11, 12, 13, 21, 50}, 'R': {1, 6, 7, 8, 21}}
 counters = {}
 def nref(p):
-    counters[p] = counters.get(p, 0) + 1; return f'{p}{counters[p]}'
-def cap(net, value, size, sheet, note=''):
-    part(nref('C'), 'Device:C_Small', value, FP[size], sheet, {'1': net, '2': 'GND'}, Note=note)
-def res(a, b, value, sheet, size='R0603', note=''):
-    part(nref('R'), 'Device:R_Small', value, FP[size], sheet, {'1': a, '2': b}, Note=note)
+    n = counters.get(p, 0) + 1
+    while n in RESERVED.get(p, ()): n += 1
+    counters[p] = n; return f'{p}{n}'
+def cap(net, value, size, sheet, note='', ref=None):
+    part(ref or nref('C'), 'Device:C_Small', value, FP[size], sheet, {'1': net, '2': 'GND'}, Note=note)
+def res(a, b, value, sheet, size='R0603', note='', ref=None):
+    part(ref or nref('R'), 'Device:R_Small', value, FP[size], sheet, {'1': a, '2': b}, Note=note)
 
 # MicroMod edge (sheet edge)
 mmpins = {int(k): v for k, v in json.load(open(os.path.join(DATA, 'micromod_pins.json'))).items()}
@@ -88,21 +92,22 @@ for p, nm in mmpins.items():
     elif p in EDGE_NET: jp[str(p)] = EDGE_NET[p]
     else: jp[str(p)] = None
 part('J1', 'rt1176-som:MicroMod_Card', 'MicroMod_Card', 'rt1176-som:MicroMod_Card_Edge', 'edge', jp)
-cap('+3V3', '22uF', '0805', 'edge', '3.3 V input bulk, at pins 2/74')
-cap('+3V3', '10uF', '0805', 'edge', '3.3 V input bulk')
-cap('USB_VIN', '100nF', '0603', 'edge', 'USB1_VBUS sense')
+cap('+3V3', '22uF', '0805', 'edge', '3.3 V input bulk, at pins 2/74', ref='C1')
+cap('+3V3', '10uF', '0805', 'edge', '3.3 V input bulk', ref='C2')
+cap('USB_VIN', '100nF', '0603', 'edge', 'USB1_VBUS sense', ref='C3')
 # reset supervisor: monitors 3.3 V, MicroMod RESET# on MR, open-drain RESET to POR_B (internal 100k pull-up in SNVS domain)
 part('U2', 'Power_Supervisor:TPS3808DBV', 'TPS3808G30DBVR', 'Package_TO_SOT_SMD:SOT-23-6', 'edge',
      {'1': 'POR_B', '2': 'GND', '3': 'RESET_N', '4': None, '5': '+3V3', '6': '+3V3'}, LCSC='C189211', MPN='TPS3808G30DBVR')
-cap('+3V3', '100nF', '0603', 'edge', 'U2 bypass')
+cap('+3V3', '100nF', '0603', 'edge', 'U2 bypass', ref='C4')
 # boot: BOOT# -> BOOT_MODE1 directly, inverted -> BOOT_MODE0
 part('U3', '74xGxx:74LVC1G04', 'SN74LVC1G04DBVR', 'Package_TO_SOT_SMD:SOT-23-5', 'edge',
      {'2': 'BOOT_N', '3': 'GND', '4': 'BOOT_MODE0', '5': '+3V3'}, LCSC='C7827', MPN='SN74LVC1G04DBVR')
-cap('+3V3', '100nF', '0603', 'edge', 'U3 bypass')
-res('+3V3', 'BOOT_N', '10k', 'edge', note='BOOT# pull-up: released = internal boot (BOOT_MODE 10)')
+cap('+3V3', '100nF', '0603', 'edge', 'U3 bypass', ref='C5')
+res('+3V3', 'BOOT_N', '10k', 'edge', note='BOOT# pull-up: released = internal boot (BOOT_MODE 10)', ref='R1')
 # test pads (bottom side, pogo-pin fixture)
+# 3.3 V and GND for programming come through the M.2 socket of the test fixture, so no pads for them
 for i, (net, txt) in enumerate([('SWDIO', 'SWDIO'), ('SWCLK', 'SWCLK'), ('RESET_N', 'RESET#'), ('BOOT_N', 'BOOT#'),
-                                ('+3V3', '3V3'), ('GND', 'GND'), ('SAI4_MCLK', 'SAI4_MCLK')], start=1):
+                                ('SAI4_MCLK', 'SAI4_MCLK')], start=1):
     part(f'TP{i}', 'Connector:TestPoint', txt, 'TestPoint:TestPoint_Pad_D1.0mm', 'edge', {'1': net})
 
 # MCU I/O units on sheet mcu
@@ -120,20 +125,19 @@ part('D1', 'Diode:BAT54C', 'BAT54C', 'Package_TO_SOT_SMD:SOT-23', 'power', {'1':
 part('FB1', 'Device:FerriteBead_Small', '120R@100MHz', 'Inductor_SMD:L_0603_1608Metric', 'power', {'1': 'DCDC_ANA', '2': 'ADC_VREFH'},
      Note='ADC reference from DCDC_ANA (1.8 V): ADC full scale is 1.8 V')
 part('FB2', 'Device:FerriteBead_Small', '120R@100MHz', 'Inductor_SMD:L_0603_1608Metric', 'power', {'1': '+3V3', '2': 'VDDA_ADC_3P3'})
-res('+3V3', 'DCDC_PSWITCH', '10k', 'power', note='PSWITCH RC: 10 ms, NXP window 5-40 ms')
-cap('DCDC_PSWITCH', '1uF', '0603', 'power', 'PSWITCH RC')
-res('DCDC_MODE', 'GND', '10k', 'power')
-res('VDD_MIPI_1P0', 'GND', '10k', 'power', note='MIPI unused: supply via 10k to GND (NXP HDG)')
-res('VDD_MIPI_1P8', 'GND', '10k', 'power', note='MIPI unused: supply via 10k to GND (NXP HDG)')
-for v, s in (('22uF', '0805'), ('4.7uF', '0603'), ('100nF', '0402'), ('100nF', '0402')): cap('+3V3', v, s, 'power', 'DCDC_IN')
-for v, s in (('22uF', '0805'), ('22uF', '0805'), ('22uF', '0805'), ('2.2uF', '0402'), ('2.2uF', '0402'), ('1uF', '0402'),
-             ('1uF', '0402'), ('100nF', '0402'), ('100nF', '0402'), ('100nF', '0402')):
-    cap('DCDC_DIG', v, s, 'power', 'DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)')
-for v, s, n in (('10uF', '0603', 'DCDC_ANA'), ('2.2uF', '0402', 'DCDC_ANA'), ('1uF', '0402', 'VDDA_1P8_IN, under M11'),
+res('+3V3', 'DCDC_PSWITCH', '10k', 'power', size='R0402', note='PSWITCH RC: 10 ms, NXP window 5-40 ms')
+cap('DCDC_PSWITCH', '1uF', '0402', 'power', 'PSWITCH RC, under P3')
+res('DCDC_MODE', 'GND', '10k', 'power', size='R0402', note='under N4')
+res('VDD_MIPI_1P0', 'GND', '10k', 'power', size='R0402', note='MIPI unused: supply via 10k to GND (NXP HDG); under F10')
+res('VDD_MIPI_1P8', 'GND', '10k', 'power', size='R0402', note='MIPI unused: supply via 10k to GND (NXP HDG); under F9')
+for v, s, r in (('22uF', '0805', 'C7'), ('4.7uF', '0603', 'C8'), ('100nF', '0402', None), ('100nF', '0402', None)): cap('+3V3', v, s, 'power', 'DCDC_IN', ref=r)
+for v, s, r in (('22uF', '0805', 'C11'), ('22uF', '0805', 'C12'), ('22uF', '0805', 'C13'), ('2.2uF', '0402', None), ('2.2uF', '0402', None),
+                ('1uF', '0402', None), ('1uF', '0402', None), ('100nF', '0402', None), ('100nF', '0402', None), ('100nF', '0402', None)):
+    cap('DCDC_DIG', v, s, 'power', 'DCDC_DIG / VDD_SOC_IN: ~71 uF total (NXP ~66 uF)', ref=r)
+for v, s, n in (('10uF', '0603', 'DCDC_ANA C21'), ('2.2uF', '0402', 'DCDC_ANA'), ('1uF', '0402', 'VDDA_1P8_IN, under M11'),
                 ('1uF', '0402', 'VDDA_ADC_1P8, under K15'), ('100nF', '0402', 'VDD_USB_1P8, under H12')):
-    cap('DCDC_ANA', v, s, 'power', n)
-for net, v, n in (('ADC_VREFH', '1uF', 'under G16'), ('ADC_VREFH', '100nF', ''), ('VDDA_ADC_3P3', '1uF', 'under J13'),
-                  ('VDDA_ADC_3P3', '100nF', ''), ('+3V3', '2.2uF', 'VDD_LPSR_IN, under R12'), ('VDD_LPSR_ANA', '4.7uF', 'under P12'),
+    cap('DCDC_ANA', v, s, 'power', n.replace(' C21', ''), ref='C21' if n.endswith('C21') else None)
+for net, v, n in (('ADC_VREFH', '1uF', 'under G16'), ('VDDA_ADC_3P3', '1uF', 'under J13'), ('+3V3', '2.2uF', 'VDD_LPSR_IN, under R12'), ('VDD_LPSR_ANA', '4.7uF', 'under P12'),
                   ('VDD_LPSR_DIG', '2.2uF', 'under P11'), ('VDDA_1P0', '2.2uF', 'under N11'), ('VDD_SNVS_IN', '1uF', 'under U12'),
                   ('VDD_SNVS_ANA', '2.2uF', 'under U14'), ('VDD_SNVS_ANA', '100nF', 'NVCC_SNVS, under U11'),
                   ('VDD_SNVS_DIG', '220nF', 'under T14')):
@@ -147,22 +151,17 @@ cap('+3V3', '1uF', '0402', 'power', 'VDD_USB_3P3, under G12')
 part('U4', 'Memory_Flash:W25Q32JVSS', 'GD25Q128EQIGR', 'rt1176-som:USON-8-1EP_4x4mm_P0.8mm_EP2.3x3mm_GigaDevice', 'mem',
      {'1': 'FLASH_CS_N', '2': 'FLASH_IO1', '3': 'FLASH_IO2', '4': 'GND', '5': 'FLASH_IO0', '6': 'FLASH_CLK', '7': 'FLASH_IO3', '8': '+3V3'},
      MPN='GD25Q128EQIGR', Note='16 MB QSPI NOR, USON-8 4x4 (footprint from DS-00480 rev 1.4; EP to GND). QE defaults to 0: WP#/HOLD# pulled up; set QE for quad reads. Not at LCSC: global sourcing')
-cap('+3V3', '100nF', '0603', 'mem', 'U4 bypass')
-for n in ('FLASH_CS_N', 'FLASH_IO2', 'FLASH_IO3'): res('+3V3', n, '10k', 'mem')
+cap('+3V3', '100nF', '0603', 'mem', 'U4 bypass', ref='C50')
+for n, r in (('FLASH_CS_N', 'R6'), ('FLASH_IO2', 'R7'), ('FLASH_IO3', 'R8')): res('+3V3', n, '10k', 'mem', ref=r)
 part('Y1', 'Device:Crystal_GND24', '24MHz', 'Crystal:Crystal_SMD_2016-4Pin_2.0x1.6mm', 'mem',
      {'1': 'XTALI', '2': 'GND', '3': 'XTALO', '4': 'GND'}, Note='24 MHz, CL to match C load caps')
-cap('XTALI', '12pF', '0603', 'mem', '24 MHz load (set from crystal CL)'); cap('XTALO', '12pF', '0603', 'mem', '24 MHz load')
+cap('XTALI', '12pF', '0402', 'mem', '24 MHz load (set from crystal CL), under U16'); cap('XTALO', '12pF', '0402', 'mem', '24 MHz load, under T16')
 part('Y2', 'Device:Crystal_Small', '32.768kHz', 'Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm', 'mem',
      {'1': 'RTC_XTALI', '2': 'RTC_XTALO'}, LCSC='C32346', MPN='Q13FC1350000400', Note='FC-135, CL 12.5 pF')
-cap('RTC_XTALI', '18pF', '0603', 'mem', '32k load'); cap('RTC_XTALO', '18pF', '0603', 'mem', '32k load')
-for k in range(3):
-    pins = {}
-    for e in range(4):
-        i = k * 4 + e
-        pins[str(e + 1)] = f'BOOT_CFG{i}'; pins[str(8 - e)] = 'GND'
-    part(f'RN{k+1}', 'Device:R_Pack04', '10k', 'Resistor_SMD:R_Array_Convex_4x0603', 'mem', pins,
-         Note='BOOT_CFG straps = 0: boot from FlexSPI1 NOR')
-res('LED', 'LED_A', '1k', 'mem')
+cap('RTC_XTALI', '18pF', '0402', 'mem', '32k load, under T13'); cap('RTC_XTALO', '18pF', '0402', 'mem', '32k load, under U13')
+for i in range(12):
+    res(f'BOOT_CFG{i}', 'GND', '10k', 'mem', size='R0402', note='BOOT_CFG strap = 0 (boot from FlexSPI1 NOR); 0402 under the BGA')
+res('LED', 'LED_A', '1k', 'mem', ref='R21')
 part('D2', 'Device:LED_Small', 'Green', 'LED_SMD:LED_0603_1608Metric', 'mem', {'1': 'GND', '2': 'LED_A'})
 
 # power flags for nets driven only by passives / internal regulators
@@ -282,7 +281,7 @@ def layout(sheet_parts, width):
 
 NOTES = {
     'edge': ['MicroMod processor card edge: SparkFun MicroMod Teensy pinout (docs/PINOUT.md).',
-             'Pins 13/15/21/23 carry SAI4 (AUD2) instead of RTS1/CTS1/SWDCK/SWDIO; SWD is on test pads TP1/TP2.',
+             'Pins 13/15/21/23 carry SAI4 (AUD2) instead of RTS1/CTS1/SWDCK/SWDIO; SWD is on bottom test pads TP1/TP2 (TP3 RESET#, TP4 BOOT#, TP5 SAI4_MCLK); fixture power comes through the M.2 socket.',
              'RESET# -> U2 manual reset; U2 holds POR_B low through power-up (open drain, POR_B has an internal 100k pull-up).',
              'BOOT# -> BOOT_MODE1 and, inverted by U3, BOOT_MODE0: released = 10 internal boot, held = 01 USB serial downloader.'],
     'mcu': ['All I/O banks at 3.3 V. Unused pads float (pad keepers). BOOT_CFG pads only go to the straps on the Flash sheet.'],
@@ -349,4 +348,6 @@ if __name__ == '__main__':
     json.dump({p['ref'] + (f'.{p["unit"]}' if p['ref'] == 'U1' else ''): {'value': p['value'], 'pins': p['pins'] if p['pins'] is not None else 'U1'}
                for p in parts}, open(os.path.join(DATA, 'design_nets.json'), 'w'), indent=0)
     json.dump(U1, open(os.path.join(DATA, 'u1_nets.json'), 'w'), indent=0)
+    json.dump({p['ref']: {'fp': p['fp'], 'value': p['value'], 'fields': p['fields']} for p in parts if not p['ref'].startswith('#')},
+              open(os.path.join(DATA, 'design_fp.json'), 'w'), indent=0)
     print(f'{len(parts)} symbols, sheets:', ', '.join(k for k, _, _ in SHEETS))

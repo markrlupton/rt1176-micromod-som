@@ -5,3 +5,5 @@ _autosave-*
 *.kicad_prl
 __pycache__/
 tools/drc.rpt
+tools/bin/
+build/

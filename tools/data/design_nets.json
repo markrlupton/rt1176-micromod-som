@@ -158,18 +158,6 @@
 }
 },
 "TP5": {
-"value": "3V3",
-"pins": {
-"1": "+3V3"
-}
-},
-"TP6": {
-"value": "GND",
-"pins": {
-"1": "GND"
-}
-},
-"TP7": {
 "value": "SAI4_MCLK",
 "pins": {
 "1": "SAI4_MCLK"
@@ -404,79 +392,79 @@
 }
 },
 "C27": {
-"value": "100nF",
-"pins": {
-"1": "ADC_VREFH",
-"2": "GND"
-}
-},
-"C28": {
 "value": "1uF",
 "pins": {
 "1": "VDDA_ADC_3P3",
 "2": "GND"
 }
 },
-"C29": {
-"value": "100nF",
-"pins": {
-"1": "VDDA_ADC_3P3",
-"2": "GND"
-}
-},
-"C30": {
+"C28": {
 "value": "2.2uF",
 "pins": {
 "1": "+3V3",
 "2": "GND"
 }
 },
-"C31": {
+"C29": {
 "value": "4.7uF",
 "pins": {
 "1": "VDD_LPSR_ANA",
 "2": "GND"
 }
 },
-"C32": {
+"C30": {
 "value": "2.2uF",
 "pins": {
 "1": "VDD_LPSR_DIG",
 "2": "GND"
 }
 },
-"C33": {
+"C31": {
 "value": "2.2uF",
 "pins": {
 "1": "VDDA_1P0",
 "2": "GND"
 }
 },
-"C34": {
+"C32": {
 "value": "1uF",
 "pins": {
 "1": "VDD_SNVS_IN",
 "2": "GND"
 }
 },
-"C35": {
+"C33": {
 "value": "2.2uF",
 "pins": {
 "1": "VDD_SNVS_ANA",
 "2": "GND"
 }
 },
-"C36": {
+"C34": {
 "value": "100nF",
 "pins": {
 "1": "VDD_SNVS_ANA",
 "2": "GND"
 }
 },
-"C37": {
+"C35": {
 "value": "220nF",
 "pins": {
 "1": "VDD_SNVS_DIG",
+"2": "GND"
+}
+},
+"C36": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
+"2": "GND"
+}
+},
+"C37": {
+"value": "2.2uF",
+"pins": {
+"1": "+3V3",
 "2": "GND"
 }
 },
@@ -530,34 +518,20 @@
 }
 },
 "C45": {
-"value": "2.2uF",
+"value": "100nF",
 "pins": {
 "1": "+3V3",
 "2": "GND"
 }
 },
 "C46": {
-"value": "2.2uF",
+"value": "100nF",
 "pins": {
 "1": "+3V3",
 "2": "GND"
 }
 },
 "C47": {
-"value": "100nF",
-"pins": {
-"1": "+3V3",
-"2": "GND"
-}
-},
-"C48": {
-"value": "100nF",
-"pins": {
-"1": "+3V3",
-"2": "GND"
-}
-},
-"C49": {
 "value": "1uF",
 "pins": {
 "1": "+3V3",
@@ -614,14 +588,14 @@
 "4": "GND"
 }
 },
-"C51": {
+"C48": {
 "value": "12pF",
 "pins": {
 "1": "XTALI",
 "2": "GND"
 }
 },
-"C52": {
+"C49": {
 "value": "12pF",
 "pins": {
 "1": "XTALO",
@@ -635,60 +609,105 @@
 "2": "RTC_XTALO"
 }
 },
-"C53": {
+"C51": {
 "value": "18pF",
 "pins": {
 "1": "RTC_XTALI",
 "2": "GND"
 }
 },
-"C54": {
+"C52": {
 "value": "18pF",
 "pins": {
 "1": "RTC_XTALO",
 "2": "GND"
 }
 },
-"RN1": {
+"R9": {
 "value": "10k",
 "pins": {
 "1": "BOOT_CFG0",
-"8": "GND",
-"2": "BOOT_CFG1",
-"7": "GND",
-"3": "BOOT_CFG2",
-"6": "GND",
-"4": "BOOT_CFG3",
-"5": "GND"
+"2": "GND"
 }
 },
-"RN2": {
+"R10": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG1",
+"2": "GND"
+}
+},
+"R11": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG2",
+"2": "GND"
+}
+},
+"R12": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG3",
+"2": "GND"
+}
+},
+"R13": {
 "value": "10k",
 "pins": {
 "1": "BOOT_CFG4",
-"8": "GND",
-"2": "BOOT_CFG5",
-"7": "GND",
-"3": "BOOT_CFG6",
-"6": "GND",
-"4": "BOOT_CFG7",
-"5": "GND"
+"2": "GND"
 }
 },
-"RN3": {
+"R14": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG5",
+"2": "GND"
+}
+},
+"R15": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG6",
+"2": "GND"
+}
+},
+"R16": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG7",
+"2": "GND"
+}
+},
+"R17": {
 "value": "10k",
 "pins": {
 "1": "BOOT_CFG8",
-"8": "GND",
-"2": "BOOT_CFG9",
-"7": "GND",
-"3": "BOOT_CFG10",
-"6": "GND",
-"4": "BOOT_CFG11",
-"5": "GND"
+"2": "GND"
 }
 },
-"R9": {
+"R18": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG9",
+"2": "GND"
+}
+},
+"R19": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG10",
+"2": "GND"
+}
+},
+"R20": {
+"value": "10k",
+"pins": {
+"1": "BOOT_CFG11",
+"2": "GND"
+}
+},
+"R21": {
 "value": "1k",
 "pins": {
 "1": "LED",
