@@ -28,7 +28,8 @@ def zone(b, layer, netname, pts, prio=0, clear=0.15):
     b.Add(z); return z
 
 def add_planes(b):
-    for z in list(b.Zones()): b.Remove(z)
+    if len(b.Zones()):                          # already there (--continue): keep them, just set the layer types
+        set_layer_types(b); return
     W = WIDTH
     full = [(-0.5, 1.2), (W + 0.5, 1.2), (W + 0.5, 22.5), (-0.5, 22.5)]   # clipped to the outline; stays off the finger bevel
     zone(b, 'In1.Cu', 'GND', full)
@@ -36,6 +37,9 @@ def add_planes(b):
     island = [(9.1, 9.7), (13.9, 9.7), (13.9, 11.3), (19.3, 11.3), (19.3, 4.6), (W + 0.5, 4.6), (W + 0.5, 15.4), (19.3, 15.4),
               (19.3, 13.0), (13.9, 13.0), (13.9, 13.7), (9.1, 13.7)]
     zone(b, 'In4.Cu', 'DCDC_DIG', island, prio=1)
+    set_layer_types(b)
+
+def set_layer_types(b):
     for l in ('In1.Cu', 'In4.Cu'): b.SetLayerType(b.GetLayerID(l), pcbnew.LT_POWER)
     for l in ('F.Cu', 'In2.Cu', 'In3.Cu', 'B.Cu'): b.SetLayerType(b.GetLayerID(l), pcbnew.LT_SIGNAL)
 
