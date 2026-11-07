@@ -111,7 +111,9 @@ def main():
     assert os.path.exists(placed), 'run tools/pcbgen.py first'
     src = OUT if '--continue' in sys.argv else placed          # --continue: start from the last routed board
     b = pcbnew.LoadBoard(src)
-    b.GetDesignSettings().m_HoleClearance = MM(0.17)
+    ds = b.GetDesignSettings()                    # the .kicad_pro next to the board can carry stale minimums: restate them
+    ds.m_HoleClearance = MM(0.17); ds.m_ViasMinSize = MM(0.25); ds.m_MinThroughDrill = MM(0.15)
+    ds.m_ViasMinAnnularWidth = MM(0.075); ds.m_TrackMinWidth = MM(0.09); ds.m_MinClearance = MM(0.09)
     add_planes(b); fill(b)
     dsn = os.path.join(WORK, 'card.dsn'); ses = os.path.join(WORK, 'card.ses')
     assert pcbnew.ExportSpecctraDSN(b, dsn), 'DSN export failed'
