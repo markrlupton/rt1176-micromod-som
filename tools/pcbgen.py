@@ -20,7 +20,7 @@ def card(v): return (pcbnew.ToMM(v.x) - 100, 122 - pcbnew.ToMM(v.y))
 WIDTH = 22.8                       # MicroMod 22 mm + 0.8 mm on the pin-1 side
 U1_C = (11.5, 12.1)                # BGA centre (card mm)
 VIA_D, VIA_DRILL = 0.3, 0.15                # JLC 6-layer minimum: 0.15 mm hole, 0.075 mm ring
-TRACK, CLEAR = 0.1, 0.1
+TRACK, CLEAR = 0.09, 0.09                  # JLC multilayer minimum trace/space (3.5 mil)
 
 # ------------------------------------------------------------------ board + rules
 def new_board():
@@ -368,7 +368,7 @@ def place_0402(b, fps, net, balls, sites, via_at):
     for ref, fp, na, nb, (tx, ty) in sorted(free_jobs, key=lambda j: j[0]):
         best = None
         for gx in np.arange(0.9, WIDTH - 0.89, 0.1):
-            for gy in np.arange(4.0, 21.3, 0.1):
+            for gy in np.arange(5.3, 21.3, 0.1):                # keep the finger escape band (y < 5.3) clear
                 for rot, hx, hy in ((0, 0.95, 0.5), (90, 0.5, 0.95)):
                     cx, cy = float(gx), float(gy)
                     pads = [(cx - 0.48, cy), (cx + 0.48, cy)] if rot == 0 else [(cx, cy - 0.48), (cx, cy + 0.48)]

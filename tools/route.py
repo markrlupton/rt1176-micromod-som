@@ -11,7 +11,7 @@ import os, re, shutil, subprocess, sys
 import pcbnew
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-from pcbgen import P, MM, WIDTH, OUT, VIA_D, VIA_DRILL
+from pcbgen import P, MM, WIDTH, OUT, VIA_D, VIA_DRILL, CLEAR
 JAR = os.path.join(HERE, 'bin', 'freerouting-1.4.4.jar')
 WORK = os.path.join(ROOT, 'build', 'route'); os.makedirs(WORK, exist_ok=True)
 
@@ -65,7 +65,7 @@ def patch_dsn(path, b):
         q = f'"{n}"' if not re.fullmatch(r'[A-Za-z0-9_]+', n) else n
         if q in nets or f'"{n}"' in nets or n in nets:
             cls.append(f'    (class pwr_{len(cls)} {q}\n      (circuit\n        (use_via Via[0-5]_{VIA_D * 1000:.0f}:{VIA_DRILL * 1000:.0f}_um)\n      )\n'
-                       f'      (rule\n        (width {w * 1000:.0f})\n        (clearance 100)\n      )\n    )\n')
+                       f'      (rule\n        (width {w * 1000:.0f})\n        (clearance {CLEAR * 1000:.0f})\n      )\n    )\n')
     i = s.index('(class kicad_default')
     s = s[:i] + ''.join(cls) + '    ' + s[i:]
     open(path, 'w').write(s)
