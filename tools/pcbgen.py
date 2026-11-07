@@ -19,7 +19,7 @@ def card(v): return (pcbnew.ToMM(v.x) - 100, 122 - pcbnew.ToMM(v.y))
 
 WIDTH = 22.8                       # MicroMod 22 mm + 0.8 mm on the pin-1 side
 U1_C = (11.5, 12.1)                # BGA centre (card mm)
-VIA_D, VIA_DRILL = 0.4, 0.2
+VIA_D, VIA_DRILL = 0.3, 0.15                # JLC 6-layer minimum: 0.15 mm hole, 0.075 mm ring
 TRACK, CLEAR = 0.1, 0.1
 
 # ------------------------------------------------------------------ board + rules
@@ -29,9 +29,9 @@ def new_board():
     ds = b.GetDesignSettings()
     ds.SetCopperLayerCount(6)
     ds.SetBoardThickness(MM(0.8))
-    ds.m_TrackMinWidth = MM(0.09); ds.m_ViasMinSize = MM(0.35); ds.m_MinThroughDrill = MM(0.2)
+    ds.m_TrackMinWidth = MM(0.09); ds.m_ViasMinSize = MM(0.25); ds.m_MinThroughDrill = MM(0.15)
     ds.m_MinClearance = MM(0.09); ds.m_HoleClearance = MM(0.2); ds.m_CopperEdgeClearance = MM(0.25)
-    ds.m_ViasMinAnnularWidth = MM(0.1); ds.m_HoleToHoleMin = MM(0.25)
+    ds.m_ViasMinAnnularWidth = MM(0.075); ds.m_HoleToHoleMin = MM(0.25)
     nc = ds.m_NetSettings.m_DefaultNetClass
     nc.SetClearance(MM(CLEAR)); nc.SetTrackWidth(MM(TRACK)); nc.SetViaDiameter(MM(VIA_D)); nc.SetViaDrill(MM(VIA_DRILL))
     for i, name in enumerate(['F.Cu', 'In1.Cu', 'In2.Cu', 'In3.Cu', 'In4.Cu', 'B.Cu']):
@@ -193,7 +193,16 @@ def fanout(b, fps, net):
             _, k, cov = best; via_at[k] = n
             for c in cov: ball_via[c] = k; todo.discard(c)
     # 2) single-ball nets: Hungarian on the free sites, biased toward the fingers / outward
-    singles = [bn for n, l in bynet.items() if len(l) == 1 for bn in l]
+    # signal balls on the outer two rings escape on F.Cu straight from the pad: no dogbone via, so the
+    # channels between them stay open (the router adds a via later only if the net needs another layer)
+    cap_nets0 = set()
+    for ref, d in json.load(open(os.path.join(DATA, 'design_nets.json'))).items():
+        if '0402' in fpinfo.get(ref.split('.')[0], {}).get('fp', '') and isinstance(d['pins'], dict):
+            cap_nets0 |= set(d['pins'].values())
+    ROWS = 'ABCDEFGHJKLMNPRTU'
+    def ring(bn): ri, c = ROWS.index(bn[0]), int(bn[1:]); return min(ri, 16 - ri, c - 1, 17 - c)
+    singles = [bn for n, l in bynet.items() if len(l) == 1 for bn in l
+               if not (ring(bn) <= 1 and n not in cap_nets0 and n not in PLANE_NETS)]
     free = [k for k in sites if k not in via_at]
     C = np.full((len(singles), len(free)), 1e6)
     edge_nets = set(json.load(open(os.path.join(DATA, 'design_nets.json')))['J1']['pins'].values())

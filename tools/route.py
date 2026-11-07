@@ -11,7 +11,7 @@ import os, re, shutil, subprocess, sys
 import pcbnew
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-from pcbgen import P, MM, WIDTH, OUT
+from pcbgen import P, MM, WIDTH, OUT, VIA_D, VIA_DRILL
 JAR = os.path.join(HERE, 'bin', 'freerouting-1.4.4.jar')
 WORK = os.path.join(ROOT, 'build', 'route'); os.makedirs(WORK, exist_ok=True)
 
@@ -60,7 +60,7 @@ def patch_dsn(path, b):
     for n, w in POWER_CLASS.items():
         q = f'"{n}"' if not re.fullmatch(r'[A-Za-z0-9_]+', n) else n
         if q in nets or f'"{n}"' in nets or n in nets:
-            cls.append(f'    (class pwr_{len(cls)} {q}\n      (circuit\n        (use_via Via[0-5]_400:200_um)\n      )\n'
+            cls.append(f'    (class pwr_{len(cls)} {q}\n      (circuit\n        (use_via Via[0-5]_{VIA_D * 1000:.0f}:{VIA_DRILL * 1000:.0f}_um)\n      )\n'
                        f'      (rule\n        (width {w * 1000:.0f})\n        (clearance 100)\n      )\n    )\n')
     i = s.index('(class kicad_default')
     s = s[:i] + ''.join(cls) + '    ' + s[i:]
@@ -77,7 +77,7 @@ def sexp(text):
 
 def import_ses(b, path):
     """KiCad 7's ImportSpecctraSES only works inside the editor, so read the session here:
-    wires become tracks and vias become 0.4/0.2 through vias (Specctra y is KiCad -y)."""
+    wires become tracks and vias become VIA_D/VIA_DRILL through vias (Specctra y is KiCad -y)."""
     ses = sexp(open(path).read())
     routes = next(x for x in ses if isinstance(x, list) and x[0] == 'routes')
     res = next(x for x in routes if isinstance(x, list) and x[0] == 'resolution')
@@ -97,7 +97,7 @@ def import_ses(b, path):
                     t = pcbnew.PCB_TRACK(b); t.SetStart(a); t.SetEnd(e); t.SetWidth(w); t.SetLayer(lay); t.SetNet(net); b.Add(t); nt += 1
             elif item[0] == 'via':
                 v = pcbnew.PCB_VIA(b); v.SetPosition(pcbnew.VECTOR2I(int(float(item[2]) * scale), int(-float(item[3]) * scale)))
-                v.SetDrill(MM(0.2)); v.SetWidth(MM(0.4)); v.SetViaType(pcbnew.VIATYPE_THROUGH); v.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu)
+                v.SetDrill(MM(VIA_DRILL)); v.SetWidth(MM(VIA_D)); v.SetViaType(pcbnew.VIATYPE_THROUGH); v.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu)
                 v.SetNet(net); b.Add(v); nv += 1
     return f'{nt} track segments, {nv} vias'
 
