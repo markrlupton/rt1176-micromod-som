@@ -124,7 +124,7 @@ def cells_of(g, it, layers):
         for ix, iy in poly_cells(item_poly(it, g.lid[ln], 0)): out.add((li, int(ix), int(iy)))
     return out
 
-def astar(Tb, Vb, src, dst, sT=None, sV=None, hist=None, soft_cost=6.0):
+def astar(Tb, Vb, src, dst, sT=None, sV=None, hist=None, soft_cost=12.0):
     """A* over (layer, x, y). With sT/sV given, other signal nets' copper is passable at soft_cost (+history) per cell."""
     dx = [1, -1, 0, 0, 1, 1, -1, -1]; dy = [0, 0, 1, -1, 1, -1, 1, -1]
     cost8 = [1, 1, 1, 1, 1.414, 1.414, 1.414, 1.414]
@@ -243,7 +243,8 @@ def main():
                 flat = {(l * NX + x) * NY + y for l, x, y in path}
                 for n2, cells in list(g.soft_cells.items()):
                     if n2 != net and flat & cells: hit.add(n2)
-                for l, x, y in path: hist[l, x, y] += 1.0
+                for l, x, y in path:
+                    if sT[l, x, y]: hist[l, x, y] += 6.0          # PathFinder history: contested cells get dearer
                 for n2 in hit: g.rip(n2); ripped.add(n2)
                 mode += ' ' + ','.join(sorted(hit))
             ns, nv = emit(b, g, net, path)
