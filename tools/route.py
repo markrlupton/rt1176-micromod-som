@@ -2,8 +2,8 @@
 
   python3 tools/route.py [--passes N]      (after tools/pcbgen.py)
 
-1. Adds the plane zones: In1/In4 GND; In3 +3V3 with a DCDC_DIG island (BGA core balls -> right-band bulk caps).
-2. Marks In1/In3/In4 as power layers, so the router keeps signals on F.Cu, In2.Cu and B.Cu.
+1. Adds the plane zones: In1 GND; In4 +3V3 with a DCDC_DIG island (BGA core balls -> right-band bulk caps).
+2. Marks In1/In4 as power layers, so the router keeps signals on F.Cu, In2.Cu, In3.Cu and B.Cu.
 3. Exports Specctra DSN, adds a power net class (wider tracks), runs Freerouting (tools/bin/freerouting-1.4.4.jar,
    built by tools/build_freerouting.sh) and imports the session back.
 4. Refills the zones and saves rt1176-micromod-som.kicad_pcb (the unrouted board is kept as *-placed.kicad_pcb)."""
@@ -31,13 +31,13 @@ def add_planes(b):
     for z in list(b.Zones()): b.Remove(z)
     W = WIDTH
     full = [(-0.5, 1.2), (W + 0.5, 1.2), (W + 0.5, 22.5), (-0.5, 22.5)]   # clipped to the outline; stays off the finger bevel
-    zone(b, 'In1.Cu', 'GND', full); zone(b, 'In4.Cu', 'GND', full)
-    zone(b, 'In3.Cu', '+3V3', full)
+    zone(b, 'In1.Cu', 'GND', full)
+    zone(b, 'In4.Cu', '+3V3', full)
     island = [(9.1, 9.7), (13.9, 9.7), (13.9, 11.3), (19.3, 11.3), (19.3, 4.6), (W + 0.5, 4.6), (W + 0.5, 15.4), (19.3, 15.4),
               (19.3, 13.0), (13.9, 13.0), (13.9, 13.7), (9.1, 13.7)]
-    zone(b, 'In3.Cu', 'DCDC_DIG', island, prio=1)
-    for l in ('In1.Cu', 'In3.Cu', 'In4.Cu'): b.SetLayerType(b.GetLayerID(l), pcbnew.LT_POWER)
-    for l in ('F.Cu', 'In2.Cu', 'B.Cu'): b.SetLayerType(b.GetLayerID(l), pcbnew.LT_SIGNAL)
+    zone(b, 'In4.Cu', 'DCDC_DIG', island, prio=1)
+    for l in ('In1.Cu', 'In4.Cu'): b.SetLayerType(b.GetLayerID(l), pcbnew.LT_POWER)
+    for l in ('F.Cu', 'In2.Cu', 'In3.Cu', 'B.Cu'): b.SetLayerType(b.GetLayerID(l), pcbnew.LT_SIGNAL)
 
 def fill(b):
     pcbnew.ZONE_FILLER(b).Fill(b.Zones())
