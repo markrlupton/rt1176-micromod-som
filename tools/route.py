@@ -105,7 +105,9 @@ def main():
     passes = int(sys.argv[sys.argv.index('--passes') + 1]) if '--passes' in sys.argv else 30
     placed = OUT.replace('.kicad_pcb', '-placed.kicad_pcb')
     assert os.path.exists(placed), 'run tools/pcbgen.py first'
-    b = pcbnew.LoadBoard(placed)
+    src = OUT if '--continue' in sys.argv else placed          # --continue: start from the last routed board
+    b = pcbnew.LoadBoard(src)
+    b.GetDesignSettings().m_HoleClearance = MM(0.17)
     add_planes(b); fill(b)
     dsn = os.path.join(WORK, 'card.dsn'); ses = os.path.join(WORK, 'card.ses')
     assert pcbnew.ExportSpecctraDSN(b, dsn), 'DSN export failed'

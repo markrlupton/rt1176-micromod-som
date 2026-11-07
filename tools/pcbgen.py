@@ -30,7 +30,7 @@ def new_board():
     ds.SetCopperLayerCount(6)
     ds.SetBoardThickness(MM(0.8))
     ds.m_TrackMinWidth = MM(0.09); ds.m_ViasMinSize = MM(0.25); ds.m_MinThroughDrill = MM(0.15)
-    ds.m_MinClearance = MM(0.09); ds.m_HoleClearance = MM(0.2); ds.m_CopperEdgeClearance = MM(0.25)
+    ds.m_MinClearance = MM(0.09); ds.m_HoleClearance = MM(0.17); ds.m_CopperEdgeClearance = MM(0.25)
     ds.m_ViasMinAnnularWidth = MM(0.075); ds.m_HoleToHoleMin = MM(0.25)
     nc = ds.m_NetSettings.m_DefaultNetClass
     nc.SetClearance(MM(CLEAR)); nc.SetTrackWidth(MM(TRACK)); nc.SetViaDiameter(MM(VIA_D)); nc.SetViaDrill(MM(VIA_DRILL))
