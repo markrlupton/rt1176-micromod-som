@@ -52,6 +52,37 @@ def cleanup(b):
         for k in kill: b.Remove(k); _KEEP.append(k)
         removed += len(kill)
 
+def drc_errors(b):
+    """number of copper-spacing errors KiCad's DRC finds"""
+    import re, tempfile
+    rpt = os.path.join(tempfile.mkdtemp(), 'drc.txt')
+    pcbnew.WriteDRCReport(b, rpt, pcbnew.EDA_UNITS_MILLIMETRES, True)
+    return len(re.findall(r'^\[(clearance|hole_clearance|copper_edge_clearance|shorting_items|tracks_crossing)\]', open(rpt).read(), re.M))
+
+def widen_stubs(b, stubs):
+    """the pad-to-plane stubs are routed at 0.09 mm; make each as wide as DRC allows (power fingers carry the supply)"""
+    base = drc_errors(b); out = []
+    for name in sorted(stubs):
+        got = TRACK
+        for w in (0.3, 0.25, 0.2, 0.15):
+            for t in stubs[name]: t.SetWidth(MM(w))
+            if drc_errors(b) <= base: got = w; break
+        for t in stubs[name]: t.SetWidth(MM(got))
+        out.append(f'{name} {got:g}')
+    print('plane stub widths (mm):', ', '.join(out))
+
+def add_pours(b):
+    """GND fill on the four signal layers (lowest priority, loose islands removed). Kept off the gold fingers."""
+    from pcbgen import P as CP, WIDTH
+    for ln, y0, clr, conn in (('F.Cu', 2.95, 0.2, pcbnew.ZONE_CONNECTION_THERMAL), ('B.Cu', 2.95, 0.2, pcbnew.ZONE_CONNECTION_THERMAL),
+                              ('In2.Cu', 1.3, 0.15, pcbnew.ZONE_CONNECTION_FULL), ('In3.Cu', 1.3, 0.15, pcbnew.ZONE_CONNECTION_FULL)):
+        z = pcbnew.ZONE(b); z.SetLayer(b.GetLayerID(ln)); z.SetNet(b.FindNet('GND'))
+        o = z.Outline(); o.NewOutline()
+        for x, y in ((-0.5, y0), (WIDTH + 0.5, y0), (WIDTH + 0.5, 22.5), (-0.5, 22.5)): o.Append(CP(x, y))
+        z.SetAssignedPriority(0); z.SetLocalClearance(MM(clr)); z.SetMinThickness(MM(0.15))
+        z.SetPadConnection(conn); z.SetThermalReliefGap(MM(0.15)); z.SetThermalReliefSpokeWidth(MM(0.2))
+        z.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_ALWAYS); b.Add(z)
+
 def main():
     b = pcbnew.LoadBoard(os.path.join(WORK, 'base.kicad_pcb'))
     fixedvia = np.fromfile(os.path.join(WORK, 'fixedvia.i16'), np.int16).reshape(NX, NY)
@@ -59,7 +90,7 @@ def main():
     def P(x, y): return pcbnew.VECTOR2I(MM(float(X0 + x * G)), MM(float(Y0 + y * G)))
     lines = open(os.path.join(WORK, 'routes.txt')).read().split('\n')
     assert lines[0] == 'CONFLICTS 0', 'the route has conflicts: ' + lines[0]
-    nt = nv = 0; net = None; vias_done = set(); segs_done = set()
+    nt = nv = 0; net = None; vias_done = set(); segs_done = set(); stubs = {}; cur = None
     def via(x, y):
         nonlocal nv
         if fixedvia[x, y] >= 0 or (x, y) in vias_done: return
@@ -73,12 +104,13 @@ def main():
         if key in segs_done: return
         segs_done.add(key)
         t = pcbnew.PCB_TRACK(b); t.SetStart(P(*a)); t.SetEnd(P(*c)); t.SetWidth(MM(TRACK)); t.SetLayer(lid[l]); t.SetNet(net); b.Add(t); nt += 1
+        if '@' in cur: stubs.setdefault(cur, []).append(t)
     for ln in lines[1:]:
         f = ln.split()
         if not f: continue
         if f[0] == 'NET':
             assert f[3] == '0', f'{f[1]} failed to route'
-            net = b.FindNet(f[1].split('@')[0]); assert net, f[1]; continue
+            net = b.FindNet(f[1].split('@')[0]); assert net, f[1]; cur = f[1]; continue
         v = list(map(int, f[2:])); cells = [tuple(v[i:i + 3]) for i in range(0, len(v), 3)]
         start = cells[0]; lastdir = None
         for a, c in zip(cells, cells[1:]):
@@ -91,6 +123,8 @@ def main():
             lastdir = d
         if start is not None: seg(cells[-1][0], start[1:], cells[-1][1:])
     print('cleanup removed', cleanup(b), 'unused fan-out vias / stub tracks')
+    widen_stubs(b, stubs)
+    add_pours(b)
     pcbnew.ZONE_FILLER(b).Fill(b.Zones())
     pcbnew.SaveBoard(OUT, b)
     print(f'added {nt} track segments and {nv} vias; saved {OUT}')

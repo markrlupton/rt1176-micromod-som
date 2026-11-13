@@ -31,14 +31,14 @@ using namespace std;
 
 static int NX, NY, NL, N2;                 // N2 = NX*NY
 static vector<int16_t> hardT, hardV, fixedvia;
-static vector<uint8_t> holeblock, mask3v3;
+static vector<uint8_t> holeblock, mask3v3, frozenT, frozenV;
 static vector<uint16_t> occT, occV;        // number of nets blocking a track centre / via centre here
 static vector<float> histT, histV;
 static vector<uint32_t> markT, markV;      // scratch for distinct stamping
 static uint32_t stampId = 1;
 
 struct Off { int dx, dy; };
-static vector<Off> discTT, discTV, discVV, discHist;
+static vector<Off> discTT, discTV, discVV, discHist, discTTw, discTVw, discWide;
 static void makeDisc(vector<Off>& d, int lim2) {           // offsets with dx^2+dy^2 < lim2
     int r = (int)ceil(sqrt((double)lim2));
     for (int dx = -r; dx <= r; dx++) for (int dy = -r; dy <= r; dy++) if (dx * dx + dy * dy < lim2) d.push_back({dx, dy});
@@ -51,6 +51,8 @@ struct Net {
     vector<int> tcells;                    // nodes used by routed track
     vector<int> vias;                      // 2-D cells of new vias
     bool failed = false;
+    bool wide = false;                     // reserve room for a 0.25 mm track (plane stubs of the power fingers)
+    bool crit = false;                     // routed first, then frozen: everything else goes around it
     int kind = 0;                          // 0 normal; 1 stub to any new via (GND); 2 stub to a new via outside the DCDC_DIG island (+3V3)
 };
 static vector<Net> nets;
@@ -58,30 +60,31 @@ static vector<Net> nets;
 static inline int nodeL(int n) { return n / N2; }
 static inline int nodeC(int n) { return n % N2; }
 
-// add (sign=+1) or remove (sign=-1) a net's blocked set from the occupancy maps
+// add (sign=+1) or remove (sign=-1) a net's blocked set from the occupancy maps; sign=0 writes it into the frozen maps
 static void contribute(const Net& net, int sign) {
     stampId++;
+    const vector<Off>& dTT = net.wide ? discTTw : discTT; const vector<Off>& dTVt = net.wide ? discTVw : discTV;
     for (int n : net.tcells) {
         int l = nodeL(n), c = nodeC(n), x = c / NY, y = c % NY;
-        for (auto& o : discTT) {
+        for (auto& o : dTT) {
             int xx = x + o.dx, yy = y + o.dy; if (xx < 0 || yy < 0 || xx >= NX || yy >= NY) continue;
             int i = l * N2 + xx * NY + yy;
-            if (markT[i] != stampId) { markT[i] = stampId; occT[i] += sign; }
+            if (markT[i] != stampId) { markT[i] = stampId; if (sign) occT[i] += sign; else frozenT[i] = 1; }
         }
     }
     for (int c : net.vias) {
         int x = c / NY, y = c % NY;
         for (auto& o : discTV) {
             int xx = x + o.dx, yy = y + o.dy; if (xx < 0 || yy < 0 || xx >= NX || yy >= NY) continue;
-            for (int l = 0; l < NL; l++) { int i = l * N2 + xx * NY + yy; if (markT[i] != stampId) { markT[i] = stampId; occT[i] += sign; } }
+            for (int l = 0; l < NL; l++) { int i = l * N2 + xx * NY + yy; if (markT[i] != stampId) { markT[i] = stampId; if (sign) occT[i] += sign; else frozenT[i] = 1; } }
         }
     }
     for (int n : net.tcells) {
         int c = nodeC(n), x = c / NY, y = c % NY;
-        for (auto& o : discTV) {
+        for (auto& o : dTVt) {
             int xx = x + o.dx, yy = y + o.dy; if (xx < 0 || yy < 0 || xx >= NX || yy >= NY) continue;
             int i = xx * NY + yy;
-            if (markV[i] != stampId) { markV[i] = stampId; occV[i] += sign; }
+            if (markV[i] != stampId) { markV[i] = stampId; if (sign) occV[i] += sign; else frozenV[i] = 1; }
         }
     }
     for (int c : net.vias) {
@@ -89,7 +92,7 @@ static void contribute(const Net& net, int sign) {
         for (auto& o : discVV) {
             int xx = x + o.dx, yy = y + o.dy; if (xx < 0 || yy < 0 || xx >= NX || yy >= NY) continue;
             int i = xx * NY + yy;
-            if (markV[i] != stampId) { markV[i] = stampId; occV[i] += sign; }
+            if (markV[i] != stampId) { markV[i] = stampId; if (sign) occV[i] += sign; else frozenV[i] = 1; }
         }
     }
 }
@@ -98,7 +101,7 @@ static void contribute(const Net& net, int sign) {
 static vector<float> gcost; static vector<uint32_t> gstamp, tgtStamp, treeStamp, ownViaStamp, ownViaBlockStamp;
 static vector<int> parent; static vector<int8_t> pdir; static vector<int16_t> tgtIdx;
 static uint32_t searchId = 0, treeId = 0;
-static double VIA_CONF = 8.0;
+static double VIA_CONF = 8.0, CRIT_VIA = 6.0;
 static bool HARD = false;                 // finishing mode: other nets' space is forbidden, not just expensive
 static double PRES = 0.5, VIA_BASE = 24.0, TURN = 0.3, HWEIGHT = 1.15;
 static const int DX[8] = {1, -1, 0, 0, 1, 1, -1, -1}, DY[8] = {0, 0, 1, -1, 1, -1, 1, -1};
@@ -154,7 +157,9 @@ static bool routeNet(int ni) {
                 int xx = x + DX[k], yy = y + DY[k]; if (xx < 0 || yy < 0 || xx >= NX || yy >= NY) continue;
                 int m = l * N2 + xx * NY + yy;
                 if (hardT[m] != -1 && hardT[m] != ni) continue;
+                if (!net.crit && frozenT[m]) continue;
                 if (HARD && occT[m]) continue;
+                if (net.wide) { bool ok = true; for (auto& o : discWide) { int x2 = xx + o.dx, y2 = yy + o.dy; if (x2 < 0 || y2 < 0 || x2 >= NX || y2 >= NY) { ok = false; break; } int q = l * N2 + x2 * NY + y2; if (hardT[q] != -1 && hardT[q] != ni) { ok = false; break; } } if (!ok) continue; }
                 float step = DL[k] * (1.0f + histT[m]) * (1.0f + (float)PRES * occT[m]);
                 if (pdir[n] >= 0 && pdir[n] != k) step += (float)TURN;
                 float ng = g + step;
@@ -168,6 +173,8 @@ static bool routeNet(int ni) {
             if (canVia) {
                 float vc = freeVia ? 0.5f : (float)(VIA_BASE * (1.0 + histV[c]) + VIA_CONF * PRES * occV[c]);   // sharing a via spot costs like sharing ~VIA_CONF track cells
                 if (HARD && !freeVia && occV[c]) canVia = false;
+                if (!net.crit && !freeVia && frozenV[c]) canVia = false;
+                if (net.crit && !freeVia) vc *= (float)CRIT_VIA;
                 if (canVia && !freeVia) {                                 // the barrel must also be legal on every layer
                     bool ok = true; float extra = 0;
                     for (int l2 = 0; l2 < NL; l2++) { int m = l2 * N2 + c; if (hardT[m] != -1 && hardT[m] != ni) ok = false; }
@@ -181,6 +188,7 @@ static bool routeNet(int ni) {
                     if (l2 == l) continue;
                     int m = l2 * N2 + c;
                     if (HARD && occT[m]) continue;
+                    if (!net.crit && frozenT[m]) continue;
                     float ng = g + vc + (1.0f + histT[m]) * (1.0f + (float)PRES * occT[m]) - 1.0f;
                     if (gstamp[m] != searchId || ng < gcost[m]) {
                         gstamp[m] = searchId; gcost[m] = ng; parent[m] = n; pdir[m] = -1; pq.push({ng + heur(x, y), m});
@@ -229,6 +237,7 @@ int main(int argc, char** argv) {
     if (getenv("VIA_CONF")) VIA_CONF = atof(getenv("VIA_CONF"));
     double presInit = getenv("PRES0") ? atof(getenv("PRES0")) : 0.3, presMul = getenv("PRESMUL") ? atof(getenv("PRESMUL")) : 1.35;
     double presMax = getenv("PRESMAX") ? atof(getenv("PRESMAX")) : 50.0;
+    bool wideStubs = !getenv("NOWIDE");
     int hardAt = getenv("HARDAT") ? atoi(getenv("HARDAT")) : 5;
     double histInc = getenv("HIST") ? atof(getenv("HIST")) : 0.25;
     int nn; { ifstream h(dir + "/header.txt"); h >> NX >> NY >> NL >> nn; }
@@ -244,10 +253,30 @@ int main(int argc, char** argv) {
     occT.assign(NT, 0); occV.assign(N2, 0); histT.assign(NT, 0); histV.assign(N2, 0); markT.assign(NT, 0); markV.assign(N2, 0);
     gcost.assign(NT + 1, 0); gstamp.assign(NT + 1, 0); tgtStamp.assign(NT, 0); treeStamp.assign(NT, 0); parent.assign(NT + 1, -1); pdir.assign(NT, -1); tgtIdx.assign(NT, 0);
     ownViaStamp.assign(N2, 0); ownViaBlockStamp.assign(N2, 0);
-    makeDisc(discTT, 14); makeDisc(discTV, 35); makeDisc(discVV, 64); makeDisc(discHist, 50);
-    // route short nets first (they have the fewest alternatives)
-    vector<int> order(nn);
-    for (int i = 0; i < nn; i++) order[i] = i;
+    makeDisc(discTT, 14); makeDisc(discTV, 35); makeDisc(discVV, 64); makeDisc(discHist, 50); makeDisc(discTTw, 28); makeDisc(discTVw, 56); makeDisc(discWide, 5);
+    frozenT.assign(NT, 0); frozenV.assign(N2, 0);
+    // critical nets (env CRIT=name,name,...): negotiate among themselves on the empty board, with vias made
+    // expensive, then freeze. They get the short, direct routes; the rest of the board works around them.
+    vector<int> order, crit;
+    { string cl = getenv("CRIT") ? getenv("CRIT") : ""; cl = "," + cl + ",";
+      for (int i = 0; i < nn; i++) { if (nets[i].kind && wideStubs) nets[i].wide = true;
+        if (nets[i].kind == 2 || cl.find("," + nets[i].name + ",") != string::npos) { nets[i].crit = true; crit.push_back(i); } else order.push_back(i); } }
+    if (!crit.empty()) {
+        PRES = presInit; bool ok = false;
+        for (int it = 0; it < 100 && !ok; it++) {
+            int nfail = 0;
+            for (int ni : crit) { if (it > 0) contribute(nets[ni], -1); if (!routeNet(ni)) nfail++; contribute(nets[ni], +1); }
+            long conf = 0;
+            for (int ni : crit) { for (int n : nets[ni].tcells) if (occT[n] >= 2) { conf++; histT[n] += (float)histInc; } for (int v : nets[ni].vias) if (occV[v] >= 2) { conf++; histV[v] += (float)histInc; } }
+            ok = conf == 0 && nfail == 0; PRES = min(PRES * presMul, presMax);
+        }
+        if (!ok) { printf("critical nets did not converge\n"); return 3; }
+        long wl = 0; int nv = 0;
+        for (int ni : crit) { contribute(nets[ni], -1); wl += nets[ni].tcells.size(); nv += nets[ni].vias.size(); }
+        for (int ni : crit) contribute(nets[ni], 0);
+        printf("%d critical nets routed and frozen: %.0f mm, %d new vias\n", (int)crit.size(), wl * 0.05, nv);
+        fill(histT.begin(), histT.end(), 0.0f); fill(histV.begin(), histV.end(), 0.0f);
+    }
     PRES = presInit;
     int bestConf = 1 << 30;
     for (int it = 0; it < maxIter; it++) {
@@ -262,6 +291,7 @@ int main(int argc, char** argv) {
         vector<string> cn;
         for (auto& net : nets) {
             bool c = false; wl += net.tcells.size(); nv += net.vias.size();
+            if (net.crit) continue;
             for (int n : net.tcells) if (occT[n] >= 2) {
                 conf++; c = true;
                 // remember the fight over the whole neighbourhood, or the two nets just shift their crossing by a cell
@@ -292,7 +322,7 @@ int main(int argc, char** argv) {
         if (cnets > 0 && cnets <= hardAt && nfail == 0) {
             // few nets left: re-route each of them with every other net treated as a fixed obstacle
             vector<int> bad;
-            for (int i = 0; i < nn; i++) { bool c = false; for (int n : nets[i].tcells) if (occT[n] >= 2) c = true; for (int v : nets[i].vias) if (occV[v] >= 2) c = true; if (c) bad.push_back(i); }
+            for (int i = 0; i < nn; i++) { if (nets[i].crit) continue; bool c = false; for (int n : nets[i].tcells) if (occT[n] >= 2) c = true; for (int v : nets[i].vias) if (occV[v] >= 2) c = true; if (c) bad.push_back(i); }
             sort(bad.begin(), bad.end());
             bool done = false; int tries = 0;
             do {

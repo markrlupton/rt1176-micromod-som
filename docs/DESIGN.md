@@ -157,15 +157,28 @@ Regenerate:
 python3 tools/pcbgen.py                  # placement + fan-out  -> *-placed.kicad_pcb
 python3 tools/nroute/prep.py             # fixed copper -> grid (build/nroute)
 g++ -O2 -std=c++17 -o build/nroute/nroute tools/nroute/nroute.cpp
-VIA_BASE=24 PRESMUL=1.2 PRESMAX=200 HIST=0.4 build/nroute/nroute build/nroute 250
-python3 tools/nroute/emit.py             # tracks + vias -> rt1176-micromod-som.kicad_pcb
+CRIT=USB_DP,USB_DN,USBHOST_DP,USBHOST_DN,XTALI,XTALO,RTC_XTALI,RTC_XTALO \
+  VIA_BASE=24 PRESMUL=1.2 PRESMAX=200 HIST=0.4 build/nroute/nroute build/nroute 250
+python3 tools/nroute/emit.py             # tracks, vias, stub widening, GND pours -> rt1176-micromod-som.kicad_pcb
 python3 tools/drc.py
 ```
 
 `prep.py` takes the power-rail routing from `docs/layout/power-rails.kicad_pcb` (the last Freerouting result).
 
+**Timing-sensitive nets** (`python3 tools/nroute/lengths.py`): the USB and crystal nets are routed first on the empty board, with vias made expensive, and then frozen. Everything else routes around them.
+
+| Net | Length | Vias | Note |
+|---|---|---|---|
+| USB_DP / USB_DN (finger pair 3/5) | 7.6 / 7.1 mm | 0 / 2 | D− ball E16 sits in the second row behind D+ (E17) with power vias on both sides, so it has to drop to In2 |
+| USBHOST_DP / USBHOST_DN | 7.1 / 7.5 mm | 0 / 0 | top layer only |
+| XTALI / XTALO (24 MHz) | 2.5 / 7.3 mm | 1 / 1 | lengths include the branch to the load cap on the bottom; ball to crystal is 2.4 / 4.3 mm |
+| RTC_XTALI / RTC_XTALO (32.768 kHz) | 4.7 / 9.0 mm | 2 / 1 | includes the load-cap branch; C52 sits 4.8 mm from its ball |
+
+**Plane stubs:** the GND and +3V3 pads in the finger band get a stub to a new via into the planes. The stubs reserve room for 0.25 mm and are then widened as far as DRC allows: +3V3 fingers 0.3 and 0.2 mm, GND fingers 0.2 to 0.3 mm, except pin 7 (0.09 mm).
+
+**Pours:** GND fill on F.Cu, In2.Cu, In3.Cu and B.Cu, lowest priority, loose islands removed, thermal reliefs on the outer layers, kept off the gold fingers.
+
 **Open layout items:**
-- USB1 D+ is 7.2 mm and D− is 10.5 mm, each with two vias, routed as single traces and not as a coupled pair. The 3.3 mm mismatch is about 20 ps, inside the USB 2.0 high-speed skew budget, but the pair should be re-laid side by side.
-- The 24 MHz crystal traces are 2.4 mm and 5.2 mm, and XTALO changes layer. Shorten them.
-- The plane stubs on the GND and +3V3 fingers are 0.09 mm wide. Widen the two +3V3 ones.
-- No GND pour on the signal layers yet.
+- The USB pairs are length-matched to within about 0.5 mm but are not laid as coupled pairs.
+- Some traces have more small jogs than a hand route would (the router works on a 0.05 mm grid).
+- Check in KiCad 10 and against JLC's DRC at stage 4; the 0.17 mm copper-to-hole rule is the one to confirm.
