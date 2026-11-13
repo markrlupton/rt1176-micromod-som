@@ -40,7 +40,7 @@ def cleanup(b):
                         layers.add('F.Cu' if p.IsOnLayer(pcbnew.F_Cu) else 'B.Cu')
                 if len(layers) < 2: kill.append(v)
         for net, ts in tracks.items():
-            if net in PROTECT: continue                     # power-rail tracks come from the earlier route: leave them alone
+            if net in PROTECT and net not in ('GND', '+3V3'): continue    # other power-rail tracks come from the earlier route: leave them alone
             for t in ts:
                 lay = t.GetLayer()
                 for e in (t.GetStart(), t.GetEnd()):

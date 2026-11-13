@@ -365,7 +365,8 @@ def place_0402(b, fps, net, balls, sites, via_at):
         placed.append((cx, cy, hx, hy))
     # routed 0402s (straps, PSWITCH RC, DCDC_MODE, MIPI pulls): free spots under the BGA, away from every via
     vias = [sites[k] for k in via_at]; top_placed = []
-    for ref, fp, na, nb, (tx, ty) in sorted(free_jobs, key=lambda j: j[0]):
+    # crystal load caps pick first, so they land next to their balls
+    for ref, fp, na, nb, (tx, ty) in sorted(free_jobs, key=lambda j: (0 if 'XTAL' in j[2] else 1, j[0])):
         best = None
         for gx in np.arange(0.9, WIDTH - 0.89, 0.1):
             for gy in np.arange(5.3, 21.3, 0.1):                # keep the finger escape band (y < 5.3) clear

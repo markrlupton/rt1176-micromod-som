@@ -183,7 +183,7 @@ def main():
             ix, iy = round((px - X0) / G), round((py - Y0) / G)
             on_grid = abs(X0 + ix * G - px) < 1e-4 and abs(Y0 + iy * G - py) < 1e-4
             if own >= 0:
-                assert on_grid, f'fan-out via of {name} is off the routing grid'
+                assert on_grid, f'fan-out via of {name} is off the routing grid: {px} {py}'
                 fixedvia[ix, iy] = own
                 terms[name].append([(li, ix, iy) for li in range(4)])
         else:
