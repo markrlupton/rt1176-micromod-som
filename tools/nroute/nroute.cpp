@@ -253,13 +253,13 @@ int main(int argc, char** argv) {
     occT.assign(NT, 0); occV.assign(N2, 0); histT.assign(NT, 0); histV.assign(N2, 0); markT.assign(NT, 0); markV.assign(N2, 0);
     gcost.assign(NT + 1, 0); gstamp.assign(NT + 1, 0); tgtStamp.assign(NT, 0); treeStamp.assign(NT, 0); parent.assign(NT + 1, -1); pdir.assign(NT, -1); tgtIdx.assign(NT, 0);
     ownViaStamp.assign(N2, 0); ownViaBlockStamp.assign(N2, 0);
-    makeDisc(discTT, 14); makeDisc(discTV, 35); makeDisc(discVV, 64); makeDisc(discHist, 50); makeDisc(discTTw, 28); makeDisc(discTVw, 56); makeDisc(discWide, 5);
+    makeDisc(discTT, 14); makeDisc(discTV, getenv("TV2") ? atoi(getenv("TV2")) : 35); makeDisc(discVV, 64); makeDisc(discHist, 50); makeDisc(discTTw, 28); makeDisc(discTVw, getenv("TV2") ? atoi(getenv("TV2")) + 24 : 56); makeDisc(discWide, 5);
     frozenT.assign(NT, 0); frozenV.assign(N2, 0);
     // critical nets (env CRIT=name,name,...): negotiate among themselves on the empty board, with vias made
     // expensive, then freeze. They get the short, direct routes; the rest of the board works around them.
     vector<int> order, crit;
     { string cl = getenv("CRIT") ? getenv("CRIT") : ""; cl = "," + cl + ",";
-      for (int i = 0; i < nn; i++) { if (nets[i].kind && wideStubs) nets[i].wide = true;
+      for (int i = 0; i < nn; i++) { if (nets[i].kind == 2 || (nets[i].kind == 1 && wideStubs)) nets[i].wide = true;      // +3V3 stubs always; GND stubs unless NOWIDE
         if (nets[i].kind == 2 || cl.find("," + nets[i].name + ",") != string::npos) { nets[i].crit = true; crit.push_back(i); } else order.push_back(i); } }
     if (!crit.empty()) {
         PRES = presInit; bool ok = false;

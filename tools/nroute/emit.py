@@ -6,10 +6,10 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__)); TOOLS = os.path.dirname(HERE); ROOT = os.path.dirname(TOOLS)
 sys.path.insert(0, TOOLS)
 from pcbgen import OUT, MM, VIA_D, VIA_DRILL, TRACK, PLANE_NETS
-from route import POWER_CLASS
-PROTECT = set(POWER_CLASS) | set(PLANE_NETS)
+sys.path.insert(0, HERE)
+from prep import PROTECT
 from finish_route import G, X0, Y0, NX, NY, SIG
-WORK = os.path.join(ROOT, 'build', 'nroute')
+WORK = os.environ.get('NROUTE_DIR') or os.path.join(ROOT, 'build', 'nroute')
 
 _KEEP = []       # removed items must outlive the board object (pcbnew 7 SWIG quirk)
 PLANES = {'GND': ('In1.Cu',), '+3V3': ('In4.Cu',), 'DCDC_DIG': ('In4.Cu',)}
@@ -62,6 +62,7 @@ def drc_errors(b):
 def widen_stubs(b, stubs):
     """the pad-to-plane stubs are routed at 0.09 mm; make each as wide as DRC allows (power fingers carry the supply)"""
     base = drc_errors(b); out = []
+    assert base == 0, f'{base} copper-spacing errors before widening: fix those first (tools/drc.py --show clearance,hole_clearance)'
     for name in sorted(stubs):
         got = TRACK
         for w in (0.3, 0.25, 0.2, 0.15):

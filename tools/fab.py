@@ -38,6 +38,7 @@ LCSC = {
     ('10k', 'R_0402_1005Metric'): ('C25744', 'UNI-ROYAL 0402WGF1002TCE'),
     ('10k', 'R_0603_1608Metric'): ('C25804', 'UNI-ROYAL 0603WAF1002T5E'),
     ('1k', 'R_0603_1608Metric'): ('C21190', 'UNI-ROYAL 0603WAF1001T5E'),
+    ('4.7k', 'R_0603_1608Metric'): ('C23162', 'UNI-ROYAL 0603WAF4701T5E'),
     ('Green', 'LED_0603_1608Metric'): ('C72043', 'Everlight 19-217/GHC-YR1S2/3T'),
     ('120R@100MHz', 'L_0603_1608Metric'): ('C12391', 'Sunlord GZ1608D121TF'),
     ('24MHz', 'Crystal_SMD_2016-4Pin_2.0x1.6mm'): ('C108160', 'YXC X201624MMD4SI, 10 pF CL, extended part'),

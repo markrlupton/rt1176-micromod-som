@@ -28,6 +28,7 @@ PARTS = {
     ('10k', 'R_0402_1005Metric'): ('Yageo', 'RC0402FR-0710KL', 'Res 10 k 1% 0402'),
     ('10k', 'R_0603_1608Metric'): ('Yageo', 'RC0603FR-0710KL', 'Res 10 k 1% 0603'),
     ('1k', 'R_0603_1608Metric'): ('Yageo', 'RC0603FR-071KL', 'Res 1 k 1% 0603'),
+    ('4.7k', 'R_0603_1608Metric'): ('Yageo', 'RC0603FR-074K7L', 'Res 4.7 k 1% 0603'),
     ('120R@100MHz', 'L_0603_1608Metric'): ('Murata', 'BLM18PG121SN1D', 'Ferrite bead 120 R @ 100 MHz 2 A 0603'),
     ('4.7uH', 'L_Changjiang_FNR4030S'): ('Sunlord', 'SWPA4030S4R7MT', 'Inductor 4.7 uH 2 A shielded 4x4x3 mm'),
     ('Green', 'LED_0603_1608Metric'): ('Lite-On', 'LTST-C191KGKT', 'LED green 0603'),

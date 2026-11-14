@@ -22,10 +22,11 @@ sys.path.insert(0, TOOLS)
 from pcbgen import OUT, MM, VIA_D, VIA_DRILL, TRACK, CLEAR, PLANE_NETS
 from route import POWER_CLASS, add_planes
 from finish_route import poly_cells, item_poly, capsule, G, X0, Y0, NX, NY, SIG
-WORK = os.path.join(ROOT, 'build', 'nroute'); os.makedirs(WORK, exist_ok=True)
-PROTECT = set(POWER_CLASS) | set(PLANE_NETS)
+WORK = os.environ.get('NROUTE_DIR') or os.path.join(ROOT, 'build', 'nroute'); os.makedirs(WORK, exist_ok=True)
+ROUTE_HERE = {'VDD_SNVS_ANA', 'VDD_SNVS_DIG'}     # power-class nets routed by nroute (their caps moved after the old route; 1 mA LDO outputs)
+PROTECT = (set(POWER_CLASS) | set(PLANE_NETS)) - ROUTE_HERE
 M = 0.010                    # rasterisation margin (mm)
-HOLE_CLR = 0.17              # copper to hole wall
+HOLE_CLR = float(os.environ.get('HOLE_CLR', 0.17))   # copper to hole wall
 HOLE_HOLE = 0.25             # hole wall to hole wall
 EDGE = 0.25                  # copper to board edge
 
@@ -61,6 +62,8 @@ def main():
     placed = OUT.replace('.kicad_pcb', '-placed.kicad_pcb')
     b = pcbnew.LoadBoard(placed)
     ds = b.GetDesignSettings()
+    ds.m_MinResolvedSpokes = 1                              # via-in-pad GND pads may keep a single spoke to the pour
+    ds.m_SolderMaskExpansion = MM(0.05)                    # JLC: mask opening 0.05 mm larger than the pad, each side
     ds.m_HoleClearance = MM(HOLE_CLR); ds.m_ViasMinSize = MM(0.25); ds.m_MinThroughDrill = MM(0.15)
     ds.m_ViasMinAnnularWidth = MM(0.075); ds.m_TrackMinWidth = MM(0.09); ds.m_MinClearance = MM(0.09)
     # power rails: take their tracks and vias from the earlier route

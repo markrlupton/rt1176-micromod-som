@@ -103,7 +103,7 @@ cap('+3V3', '100nF', '0603', 'edge', 'U2 bypass', ref='C4')
 part('U3', '74xGxx:74LVC1G04', 'SN74LVC1G04DBVR', 'Package_TO_SOT_SMD:SOT-23-5', 'edge',
      {'2': 'BOOT_N', '3': 'GND', '4': 'BOOT_MODE0', '5': '+3V3'}, LCSC='C7827', MPN='SN74LVC1G04DBVR')
 cap('+3V3', '100nF', '0603', 'edge', 'U3 bypass', ref='C5')
-res('+3V3', 'BOOT_N', '10k', 'edge', note='BOOT# pull-up: released = internal boot (BOOT_MODE 10)', ref='R1')
+res('+3V3', 'BOOT_N', '4.7k', 'edge', note='BOOT# pull-up: released = internal boot (BOOT_MODE 10). 4.7k per NXP: BOOT_MODE pins have ~35k internal pull-downs', ref='R1')
 # test pads (bottom side, pogo-pin fixture)
 # 3.3 V and GND for programming come through the M.2 socket of the test fixture, so no pads for them
 for i, (net, txt) in enumerate([('SWDIO', 'SWDIO'), ('SWCLK', 'SWCLK'), ('RESET_N', 'RESET#'), ('BOOT_N', 'BOOT#'),
