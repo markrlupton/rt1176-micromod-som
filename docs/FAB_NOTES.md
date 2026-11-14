@@ -46,3 +46,14 @@ Things JLC's checker may flag that are expected:
 - Y1 is YXC X201624MMD4SI (C108160), 10 pF load. C48/C49 are 12 pF, which gives about 9 pF with board stray; close
   enough for USB and audio. Use 15 pF if you want it exactly on frequency.
 - The flash needs QE = 1 set once for quad reads (the NXP boot ROM does this when you program it with their tools).
+
+## Buying parts yourself
+
+`fab/bom-distributors.csv` (made by `python3 tools/bom_dist.py`) uploads to the BOM tools at Octopart, Mouser,
+DigiKey and Newark: map **Manufacturer Part Number** and either **Qty per board** or **Qty for 5 boards** (5 cards plus
+spares: 10 extra of each passive, one extra of each IC, LED and crystal).
+
+Parts that differ from the JLC BOM (same value, rating and footprint; LCSC-only brands swapped for ones the western
+distributors stock): 12/18 pF caps (Murata GRM1555 C0G), resistors (Yageo RC series), ferrite beads (Murata
+BLM18PG121SN1D), LED (Lite-On LTST-C191KGKT), 24 MHz crystal (Abracon ABM11W-24.0000MHZ-8-D1X-T3, 8 pF load: the 12 pF
+load caps suit it well). L1 (Sunlord SWPA4030S4R7MT) is at DigiKey; Newark may not carry it.
